@@ -1,0 +1,6 @@
+{
+  "name": "Наран Одын Кинематик Ертөнц",
+  "description": "10 настай Наран од хүүгийн дуртай кино (Teach you a lesson), аниме (JJK), болон хөлбөмбөгийн хоббиг танилцуулсан Netflix хэв маягийн кино баатар хуудас.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

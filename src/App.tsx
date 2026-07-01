@@ -106,7 +106,7 @@ const fallbackQuestions = [
     answer: "One Piece",
     options: ["One Piece", "Naruto", "Bleach", "Fairy Tail"],
     answers: ["one piece", "onepiece", "ван пис", "хэрэмт далайн дээрэмчид", "хэрэмт далай", "luffy", "луффи"],
-    image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=800&auto=format&fit=crop&q=80",
+    image: "https://i.redd.it/0u2aefrzacmc1.jpeg",
     video: "https://www.youtube.com/embed/S8_YwFLCh4U"
   },
   {
@@ -115,7 +115,7 @@ const fallbackQuestions = [
     answer: "Naruto",
     options: ["Naruto", "Boruto", "Dragon Ball Z", "My Hero Academia"],
     answers: ["naruto", "наруто", "naruto shippuden", "шиппүдэн", "наруто шиппудэн"],
-    image: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop&q=80",
+    image: "https://m.media-amazon.com/images/M/MV5BZTNjOWI0ZTAtOGY1OS00ZGU0LWEyOWYtMjhkYjdlYmVjMDk2XkEyXkFqcGc@._V1_.jpg",
     video: "https://www.youtube.com/embed/Q6_6S_Q_v9Q"
   },
   {
@@ -124,7 +124,7 @@ const fallbackQuestions = [
     answer: "Demon Slayer",
     options: ["Demon Slayer", "Jujutsu Kaisen", "Attack on Titan", "Tokyo Ghoul"],
     answers: ["demon slayer", "kimetsu no yaiba", "демон слейер", "хараал идэгчдийг устгагч", "чөтгөрийн ангууч", "nezuko", "tanjiro"],
-    image: "https://images.unsplash.com/photo-1618336753974-aae8e04506aa?w=800&auto=format&fit=crop&q=80",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0fMxjRck-hY6tdV_nW-SnIWjFEvO3SGjYc77oCHjPUg&s=10",
     video: "https://www.youtube.com/embed/VQGCKyVZIM4"
   },
   {
@@ -133,7 +133,7 @@ const fallbackQuestions = [
     answer: "Attack on Titan",
     options: ["Attack on Titan", "Neon Genesis Evangelion", "Death Note", "Fullmetal Alchemist"],
     answers: ["attack on titan", "shingeki no kyojin", "титан руу дайралт", "attackontitan", "титануудын дайралт", "eren", "эрэн"],
-    image: "https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?w=800&auto=format&fit=crop&q=80",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQigobSp1b1DRmp6xeC4hcycUCRnUXcP3XQTxdkHxd14w&s=10",
     video: "https://www.youtube.com/embed/LHtdkW5__9E"
   },
   {
@@ -142,7 +142,7 @@ const fallbackQuestions = [
     answer: "Death Note",
     options: ["Death Note", "Code Geass", "Monster", "Steins;Gate"],
     answers: ["death note", "deathnote", "үхлийн тэмдэглэл", "light yagami", "l"],
-    image: "https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=800&auto=format&fit=crop&q=80",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSE-s9JscbcqNhv5TVEvqhf3-mJDkX7FZ3YJTgMSjT-pg&s",
     video: "https://www.youtube.com/embed/N3iF0UIsgV4"
   },
   {
@@ -151,7 +151,7 @@ const fallbackQuestions = [
     answer: "Jujutsu Kaisen",
     options: ["Jujutsu Kaisen", "Chainsaw Man", "Bleach", "Hunter x Hunter"],
     answers: ["jujutsu kaisen", "jjk", "жужуцу кайсен", "хараал тулаан", "gojo", "гожо", "itadori"],
-    image: "https://images.unsplash.com/photo-162755658741d-bktW7d67f5da?w=800&auto=format&fit=crop&q=80",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTh3hSw1X2eKkBBNgd3rEtwENN-wnk38NLfJMpUoPiNlw&s=10",
     video: "https://www.youtube.com/embed/pm9VxG0X1u4"
   },
   {
@@ -160,7 +160,7 @@ const fallbackQuestions = [
     answer: "Dragon Ball Z",
     options: ["Dragon Ball Z", "One Punch Man", "My Hero Academia", "Naruto"],
     answers: ["dragon ball", "dragon ball z", "dragonball", "луут бөмбөг", "goku", "гоку"],
-    image: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPOw2RvQ2PL8hInBAMTx3eK3imEGUefhgkxOJjfvHRCw&s=10",
     video: "https://www.youtube.com/embed/zghyYV_a29c"
   },
   {
@@ -169,7 +169,7 @@ const fallbackQuestions = [
     answer: "My Hero Academia",
     options: ["My Hero Academia", "Assassination Classroom", "Mob Psycho 100", "Black Clover"],
     answers: ["my hero academia", "boku no hero academia", "mha", "миний баатарлаг академи", "deku", "деку", "all might"],
-    image: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZ5m7Cz3MqjUYlYZAH2r2pw1M0wLlZAIZaSw_XsUDAjQ&s=10",
     video: "https://www.youtube.com/embed/EP7_gSIn1u4"
   },
   {
@@ -178,7 +178,7 @@ const fallbackQuestions = [
     answer: "One Punch Man",
     options: ["One Punch Man", "Dragon Ball", "Hunter x Hunter", "Mob Psycho 100"],
     answers: ["one punch man", "onepunchman", "нэг цохилтын хүн", "opm", "saitama", "сайтама"],
-    image: "https://images.unsplash.com/photo-1533158326339-7f3cf2404354?w=800&auto=format&fit=crop&q=80",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8Ep_Y6ZrX2R2m3daKOOxoQpOSVKM-plRydTGrDnG32g&s=10",
     video: "https://www.youtube.com/embed/2JAEl3LDYkM"
   },
   {
@@ -187,7 +187,7 @@ const fallbackQuestions = [
     answer: "Hunter x Hunter",
     options: ["Hunter x Hunter", "Yu Yu Hakusho", "Fullmetal Alchemist", "Bleach"],
     answers: ["hunter x hunter", "hunterxhunter", "hxh", "ангуучдын ангууч", "gon", "гон", "killua", "киллуа"],
-    image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop&q=80",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLYwY12mnQ4o2D51taXncJf2LGQ-SX4Y63cStG5aZHyA&s=10",
     video: "https://www.youtube.com/embed/d6kBeJjQF08"
   }
 ];
@@ -1015,6 +1015,21 @@ export default function App() {
                   /* REVEAL STATE (Answer feedback + Anime Image + YouTube Iframe) */
                   <div className="bg-white/5 border border-white/10 rounded-2xl p-5 md:p-6 animate-blur-fade-up">
                     
+                    {/* Anime Image (At the Top) */}
+                    <div className="relative aspect-video w-full rounded-xl overflow-hidden border border-white/10 mb-5 group">
+                      <img
+                        src={questions[currentQuestionIndex].image}
+                        alt={questions[currentQuestionIndex].answer}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent flex items-end p-4">
+                        <span className="text-xl font-black text-white drop-shadow">
+                          {questions[currentQuestionIndex].answer}
+                        </span>
+                      </div>
+                    </div>
+
                     {/* Status Alert Badge */}
                     <div className="flex items-center gap-3 mb-4">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0 ${
@@ -1072,25 +1087,10 @@ export default function App() {
                       </div>
                     )}
 
-                    {/* REVEAL CONTENT: IMAGE & YOUTUBE VIDEO */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                      {/* Anime Image */}
-                      <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 group">
-                        <img
-                          src={questions[currentQuestionIndex].image}
-                          alt={questions[currentQuestionIndex].answer}
-                          referrerPolicy="no-referrer"
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent flex items-end p-3">
-                          <span className="text-sm font-black text-white drop-shadow">
-                            {questions[currentQuestionIndex].answer}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* YouTube Video Embed */}
-                      <div className="aspect-video rounded-xl overflow-hidden border border-white/10 bg-black">
+                    {/* YouTube Video Embed (Below Feedback, Full-Width) */}
+                    <div className="mt-4">
+                      <div className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-2">Аниме Трейлер:</div>
+                      <div className="aspect-video w-full rounded-xl overflow-hidden border border-white/10 bg-black">
                         <iframe
                           className="w-full h-full"
                           src={`${questions[currentQuestionIndex].video}?autoplay=1&mute=0`}

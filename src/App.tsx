@@ -99,6 +99,109 @@ const slides: SlideData[] = [
   }
 ];
 
+const fallbackQuestions = [
+  {
+    id: 1,
+    emojis: "🏴‍☠️👒🍖⚔️",
+    answer: "One Piece",
+    options: ["One Piece", "Naruto", "Bleach", "Fairy Tail"],
+    answers: ["one piece", "onepiece", "ван пис", "хэрэмт далайн дээрэмчид", "хэрэмт далай", "luffy", "луффи"],
+    image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=800&auto=format&fit=crop&q=80",
+    video: "https://www.youtube.com/embed/S8_YwFLCh4U"
+  },
+  {
+    id: 2,
+    emojis: "🦊🍥🍜⚡",
+    answer: "Naruto",
+    options: ["Naruto", "Boruto", "Dragon Ball Z", "My Hero Academia"],
+    answers: ["naruto", "наруто", "naruto shippuden", "шиппүдэн", "наруто шиппудэн"],
+    image: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop&q=80",
+    video: "https://www.youtube.com/embed/Q6_6S_Q_v9Q"
+  },
+  {
+    id: 3,
+    emojis: "⚔️👹👺🌊",
+    answer: "Demon Slayer",
+    options: ["Demon Slayer", "Jujutsu Kaisen", "Attack on Titan", "Tokyo Ghoul"],
+    answers: ["demon slayer", "kimetsu no yaiba", "демон слейер", "хараал идэгчдийг устгагч", "чөтгөрийн ангууч", "nezuko", "tanjiro"],
+    image: "https://images.unsplash.com/photo-1618336753974-aae8e04506aa?w=800&auto=format&fit=crop&q=80",
+    video: "https://www.youtube.com/embed/VQGCKyVZIM4"
+  },
+  {
+    id: 4,
+    emojis: "🧱🦖⚔️🩸",
+    answer: "Attack on Titan",
+    options: ["Attack on Titan", "Neon Genesis Evangelion", "Death Note", "Fullmetal Alchemist"],
+    answers: ["attack on titan", "shingeki no kyojin", "титан руу дайралт", "attackontitan", "титануудын дайралт", "eren", "эрэн"],
+    image: "https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?w=800&auto=format&fit=crop&q=80",
+    video: "https://www.youtube.com/embed/LHtdkW5__9E"
+  },
+  {
+    id: 5,
+    emojis: "📓🍎💀✍️",
+    answer: "Death Note",
+    options: ["Death Note", "Code Geass", "Monster", "Steins;Gate"],
+    answers: ["death note", "deathnote", "үхлийн тэмдэглэл", "light yagami", "l"],
+    image: "https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=800&auto=format&fit=crop&q=80",
+    video: "https://www.youtube.com/embed/N3iF0UIsgV4"
+  },
+  {
+    id: 6,
+    emojis: "🤞😈🔴👁️",
+    answer: "Jujutsu Kaisen",
+    options: ["Jujutsu Kaisen", "Chainsaw Man", "Bleach", "Hunter x Hunter"],
+    answers: ["jujutsu kaisen", "jjk", "жужуцу кайсен", "хараал тулаан", "gojo", "гожо", "itadori"],
+    image: "https://images.unsplash.com/photo-162755658741d-bktW7d67f5da?w=800&auto=format&fit=crop&q=80",
+    video: "https://www.youtube.com/embed/pm9VxG0X1u4"
+  },
+  {
+    id: 7,
+    emojis: "🐉🟠🦍⚡",
+    answer: "Dragon Ball Z",
+    options: ["Dragon Ball Z", "One Punch Man", "My Hero Academia", "Naruto"],
+    answers: ["dragon ball", "dragon ball z", "dragonball", "луут бөмбөг", "goku", "гоку"],
+    image: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80",
+    video: "https://www.youtube.com/embed/zghyYV_a29c"
+  },
+  {
+    id: 8,
+    emojis: "🏫🥦💥🥦",
+    answer: "My Hero Academia",
+    options: ["My Hero Academia", "Assassination Classroom", "Mob Psycho 100", "Black Clover"],
+    answers: ["my hero academia", "boku no hero academia", "mha", "миний баатарлаг академи", "deku", "деку", "all might"],
+    image: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80",
+    video: "https://www.youtube.com/embed/EP7_gSIn1u4"
+  },
+  {
+    id: 9,
+    emojis: "👨‍🦲🥊🦸‍♂️💥",
+    answer: "One Punch Man",
+    options: ["One Punch Man", "Dragon Ball", "Hunter x Hunter", "Mob Psycho 100"],
+    answers: ["one punch man", "onepunchman", "нэг цохилтын хүн", "opm", "saitama", "сайтама"],
+    image: "https://images.unsplash.com/photo-1533158326339-7f3cf2404354?w=800&auto=format&fit=crop&q=80",
+    video: "https://www.youtube.com/embed/2JAEl3LDYkM"
+  },
+  {
+    id: 10,
+    emojis: "🎣🕷️🃏⚡",
+    answer: "Hunter x Hunter",
+    options: ["Hunter x Hunter", "Yu Yu Hakusho", "Fullmetal Alchemist", "Bleach"],
+    answers: ["hunter x hunter", "hunterxhunter", "hxh", "ангуучдын ангууч", "gon", "гон", "killua", "киллуа"],
+    image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop&q=80",
+    video: "https://www.youtube.com/embed/d6kBeJjQF08"
+  }
+];
+
+// Fisher-Yates Shuffle Algorithm
+const shuffleArray = <T,>(array: T[]): T[] => {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+};
+
 export default function App() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -107,7 +210,240 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
+  // Game state
+  const [isGameOpen, setIsGameOpen] = useState(false);
+  const [questions, setQuestions] = useState<any[]>(() => {
+    const shuffledFallback = fallbackQuestions.map((q: any) => ({
+      ...q,
+      options: shuffleArray(q.options || [])
+    }));
+    return shuffleArray(shuffledFallback);
+  });
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [typedAnswer, setTypedAnswer] = useState("");
+  const [hasAnswered, setHasAnswered] = useState(false);
+  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+  const [timeLeft, setTimeLeft] = useState(15);
+  const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
+  const [lives, setLives] = useState(3);
+  const [score, setScore] = useState(0);
+  const [showBonus, setShowBonus] = useState(false);
+  const [playMode, setPlayMode] = useState<'options' | 'type'>('options');
+
   const current = slides[activeSlide];
+
+  // Fetch questions from data.json on mount
+  useEffect(() => {
+    fetch('/data.json')
+      .then((res) => {
+        if (!res.ok) throw new Error("HTTP error " + res.status);
+        return res.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const processed = data.map((q: any) => ({
+            ...q,
+            options: shuffleArray(q.options || [])
+          }));
+          setQuestions(shuffleArray(processed));
+        }
+      })
+      .catch((err) => {
+        console.warn("Could not fetch data.json, using high-quality local fallback questions.", err);
+      });
+  }, []);
+
+  // Play Sound Helper using Web Audio API synthesis
+  const playSound = (type: 'correct' | 'incorrect' | 'win' | 'lose') => {
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const ctx = new AudioContextClass();
+
+      if (type === 'correct') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+        osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.4);
+      } else if (type === 'incorrect') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(130, ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(90, ctx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.3);
+      } else if (type === 'win') {
+        // Upbeat victory tune: C4 -> E4 -> G4 -> C5
+        const notes = [261.63, 329.63, 392.00, 523.25];
+        notes.forEach((freq, index) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, ctx.currentTime + index * 0.12);
+          gain.gain.setValueAtTime(0.1, ctx.currentTime + index * 0.12);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + index * 0.12 + 0.3);
+          osc.start(ctx.currentTime + index * 0.12);
+          osc.stop(ctx.currentTime + index * 0.12 + 0.3);
+        });
+      } else if (type === 'lose') {
+        // Melodramatic descending defeat sound: G3 -> Eb3 -> C3
+        const notes = [196.00, 155.56, 130.81];
+        notes.forEach((freq, index) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(freq, ctx.currentTime + index * 0.18);
+          gain.gain.setValueAtTime(0.12, ctx.currentTime + index * 0.18);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + index * 0.18 + 0.4);
+          osc.start(ctx.currentTime + index * 0.18);
+          osc.stop(ctx.currentTime + index * 0.18 + 0.4);
+        });
+      }
+    } catch (err) {
+      console.warn('Audio play blocked or unsupported by browser.', err);
+    }
+  };
+
+  // Check Answer Helper (Case and Space Insensitive)
+  const checkAnswer = (selected: string, question: any) => {
+    const normalize = (str: string) =>
+      str
+        .toLowerCase()
+        .replace(/\s+/g, '')
+        .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
+
+    const normSelected = normalize(selected);
+
+    // check direct answer or any aliases in answers array
+    const matchesAnswer = normalize(question.answer) === normSelected;
+    const matchesAlias = Array.isArray(question.answers) && question.answers.some((ans: string) => normalize(ans) === normSelected);
+
+    return matchesAnswer || matchesAlias;
+  };
+
+  // Submit Answer Action
+  const handleAnswer = (answerText: string | null, isTimeout: boolean = false) => {
+    if (hasAnswered) return;
+
+    const question = questions[currentQuestionIndex];
+    if (!question) return;
+
+    setHasAnswered(true);
+
+    if (isTimeout) {
+      setIsCorrect(false);
+      setSelectedOption(null);
+      const nextLives = lives - 1;
+      setLives(nextLives);
+      setConsecutiveCorrect(0);
+      if (nextLives <= 0) {
+        playSound('lose');
+      } else {
+        playSound('incorrect');
+      }
+      return;
+    }
+
+    const correct = checkAnswer(answerText || "", question);
+    setIsCorrect(correct);
+    setSelectedOption(answerText);
+
+    if (correct) {
+      playSound('correct');
+      setScore((prev) => prev + 10);
+      setConsecutiveCorrect((prev) => {
+        const nextStreak = prev + 1;
+        if (nextStreak === 3) {
+          setScore((s) => s + 20); // +20 points bonus
+          setShowBonus(true);
+          setTimeout(() => setShowBonus(false), 2500);
+          return 0; // Reset streak counter after award
+        }
+        return nextStreak;
+      });
+    } else {
+      const nextLives = lives - 1;
+      setLives(nextLives);
+      setConsecutiveCorrect(0);
+      if (nextLives <= 0) {
+        playSound('lose');
+      } else {
+        playSound('incorrect');
+      }
+    }
+  };
+
+  // Timer Effect
+  useEffect(() => {
+    if (!isGameOpen || hasAnswered || lives <= 0 || currentQuestionIndex >= questions.length) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          handleAnswer(null, true); // Timeout trigger
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isGameOpen, hasAnswered, currentQuestionIndex, lives, questions]);
+
+  const handleNextQuestion = () => {
+    setHasAnswered(false);
+    setIsCorrect(null);
+    setSelectedOption(null);
+    setTypedAnswer("");
+    setTimeLeft(15);
+    setCurrentQuestionIndex((prev) => {
+      const nextIndex = prev + 1;
+      if (nextIndex >= questions.length) {
+        playSound('win');
+      }
+      return nextIndex;
+    });
+  };
+
+  const resetGame = () => {
+    setCurrentQuestionIndex(0);
+    setHasAnswered(false);
+    setIsCorrect(null);
+    setSelectedOption(null);
+    setTypedAnswer("");
+    setTimeLeft(15);
+    setConsecutiveCorrect(0);
+    setLives(3);
+    setScore(0);
+    setShowBonus(false);
+
+    // Reshuffle both questions and their multiple-choice options on restart
+    setQuestions((prev) => {
+      const reshuffled = prev.map((q: any) => ({
+        ...q,
+        options: shuffleArray(q.options || [])
+      }));
+      return shuffleArray(reshuffled);
+    });
+  };
 
   const handleNext = () => {
     setActiveSlide((prev) => (prev + 1) % slides.length);
@@ -367,12 +703,18 @@ export default function App() {
             {/* CTA Buttons */}
             <div className="flex flex-wrap items-center gap-3 sm:gap-4">
               <button
-                onClick={() => setIsPlayingModalOpen(true)}
+                onClick={() => {
+                  if (activeSlide === 1) {
+                    setIsGameOpen(true);
+                  } else {
+                    setIsPlayingModalOpen(true);
+                  }
+                }}
                 className="flex items-center gap-2.5 bg-white text-black rounded-full font-medium px-6 sm:px-8 py-2.5 sm:py-3 hover:bg-gray-200 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-white/10 animate-blur-fade-up cursor-pointer"
                 style={{ animationDelay: '600ms' }}
               >
                 <Play size={18} className="fill-black text-black" />
-                <span>Watch Now</span>
+                <span>Play Now</span>
               </button>
 
               <button
@@ -426,6 +768,353 @@ export default function App() {
       </div>
 
       {/* --- MODALS & OVERLAYS --- */}
+
+      {/* ANIME GUESSER GAME MODAL */}
+      {isGameOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-2xl animate-fade-in overflow-y-auto">
+          <div className="relative w-full max-w-2xl bg-gray-950/80 border border-white/10 rounded-3xl overflow-hidden shadow-2xl p-6 md:p-8 flex flex-col">
+            
+            {/* Close Button */}
+            <button
+              onClick={() => {
+                setIsGameOpen(false);
+                resetGame();
+              }}
+              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/5 hover:bg-white/15 flex items-center justify-center transition-colors text-white z-10"
+              title="Хаах"
+            >
+              <X size={20} />
+            </button>
+
+            {/* STREAK BONUS ANIMATED BANNER */}
+            {showBonus && (
+              <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20 bg-gradient-to-r from-amber-500 to-red-600 text-white px-6 py-2 rounded-full font-black tracking-widest text-sm shadow-2xl shadow-red-500/50 flex items-center gap-2 animate-bounce">
+                🔥 ДАРААЛАН 3 ЗӨВ! БОНУС +20 ОНОО! 🔥
+              </div>
+            )}
+
+            {/* GAME STATE: GAME OVER */}
+            {lives <= 0 ? (
+              <div className="flex flex-col items-center text-center py-8 animate-blur-fade-up">
+                <div className="w-24 h-24 rounded-full bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-500 mb-6 relative">
+                  <div className="absolute inset-0 rounded-full bg-red-600 blur-xl opacity-30 animate-pulse" />
+                  <span className="text-5xl">💀</span>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-2">Тоглоом дууслаа!</h2>
+                <p className="text-gray-400 text-lg mb-6">Таны 3 амь дууслаа. Илүү их аниме үзээрэй! 🍿</p>
+                
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-6 w-full max-w-sm mb-8">
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-gray-400 font-medium">Нийт оноо:</span>
+                    <span className="text-2xl font-black text-amber-400">{score}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400 font-medium">Асуулт:</span>
+                    <span className="text-lg font-bold text-white">{currentQuestionIndex} / {questions.length}</span>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <button
+                    onClick={resetGame}
+                    className="bg-red-600 text-white font-bold rounded-full px-8 py-3.5 hover:bg-red-700 transition-all active:scale-95 shadow-lg shadow-red-600/30 cursor-pointer"
+                  >
+                    Дахин эхлүүлэх 🔄
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsGameOpen(false);
+                      resetGame();
+                    }}
+                    className="bg-white/10 hover:bg-white/15 text-white font-semibold rounded-full px-8 py-3.5 transition-all cursor-pointer"
+                  >
+                    Буцах
+                  </button>
+                </div>
+              </div>
+            ) : currentQuestionIndex >= questions.length ? (
+              /* GAME STATE: VICTORY */
+              <div className="flex flex-col items-center text-center py-8 animate-blur-fade-up">
+                <div className="w-24 h-24 rounded-full bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-6 relative">
+                  <div className="absolute inset-0 rounded-full bg-amber-500 blur-xl opacity-30 animate-pulse" />
+                  <Trophy size={48} className="animate-bounce" />
+                </div>
+                <h2 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-500 mb-2">
+                  БАЯР ХҮРГЭЕ! 🎉
+                </h2>
+                <p className="text-red-400 font-bold text-lg mb-6">Та жинхэнэ Аниме Отаку байна! 👑</p>
+                
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-6 w-full max-w-sm mb-8">
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-gray-400 font-medium">Эцсийн оноо:</span>
+                    <span className="text-3xl font-black text-amber-400">{score}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400 font-medium">Үлдсэн амь:</span>
+                    <span className="text-lg font-bold text-red-500">
+                      {"❤️".repeat(lives)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <button
+                    onClick={resetGame}
+                    className="bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-black rounded-full px-8 py-3.5 hover:brightness-110 transition-all active:scale-95 shadow-lg shadow-amber-500/30 cursor-pointer"
+                  >
+                    Дахин тоглох 🔄
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsGameOpen(false);
+                      resetGame();
+                    }}
+                    className="bg-white/10 hover:bg-white/15 text-white font-semibold rounded-full px-8 py-3.5 transition-all cursor-pointer"
+                  >
+                    Хаах
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* GAME STATE: PLAYING QUESTION */
+              <div key={`question-${currentQuestionIndex}`} className="flex flex-col animate-blur-fade-up">
+                
+                {/* Game HUD (Score, Lives, Streak) */}
+                <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+                  <div className="flex flex-col">
+                    <span className="text-xs text-gray-500 uppercase font-bold tracking-wider">Оноо</span>
+                    <span className="text-xl font-black text-amber-400 flex items-center gap-1.5">
+                      🏆 {score}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col items-center">
+                    <span className="text-xs text-gray-500 uppercase font-bold tracking-wider">Амь</span>
+                    <div className="flex gap-1 text-lg">
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <span
+                          key={i}
+                          className={`transition-all duration-300 ${
+                            i < lives ? "opacity-100 scale-100 filter-none" : "opacity-30 scale-75 grayscale"
+                          }`}
+                        >
+                          ❤️
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col items-end">
+                    <span className="text-xs text-gray-500 uppercase font-bold tracking-wider">Дараалсан зөв</span>
+                    <span className="text-lg font-extrabold text-red-500 flex items-center gap-1">
+                      🔥 {consecutiveCorrect}/3
+                    </span>
+                  </div>
+                </div>
+
+                {/* Question Info & Modes */}
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-sm font-semibold bg-red-600/30 text-red-300 px-3 py-1 rounded-full border border-red-500/30">
+                    Асуулт {currentQuestionIndex + 1} / {questions.length}
+                  </span>
+
+                  {/* Mode Selector */}
+                  {!hasAnswered && (
+                    <div className="flex bg-white/5 border border-white/10 rounded-lg p-0.5 text-xs">
+                      <button
+                        onClick={() => setPlayMode('options')}
+                        className={`px-3 py-1 rounded-md font-bold transition-all cursor-pointer ${
+                          playMode === 'options' ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white'
+                        }`}
+                      >
+                        Сонгох 🎯
+                      </button>
+                      <button
+                        onClick={() => setPlayMode('type')}
+                        className={`px-3 py-1 rounded-md font-bold transition-all cursor-pointer ${
+                          playMode === 'type' ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white'
+                        }`}
+                      >
+                        Бичих ✍️
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Timer Bar */}
+                {!hasAnswered && (
+                  <div className="mb-4">
+                    <div className="flex justify-between items-center text-xs text-gray-400 mb-1">
+                      <span>Үлдсэн хугацаа:</span>
+                      <span className={`font-mono font-bold ${timeLeft <= 5 ? 'text-red-500 animate-pulse text-sm' : 'text-white'}`}>
+                        {timeLeft} сек
+                      </span>
+                    </div>
+                    <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full transition-all duration-1000 ${
+                          timeLeft <= 5 ? 'bg-red-500 animate-pulse' : 'bg-gradient-to-r from-red-600 to-amber-500'
+                        }`}
+                        style={{ width: `${(timeLeft / 15) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Question: EMOJIS */}
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center mb-6 relative">
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-red-600/10 to-amber-500/10 blur-sm pointer-events-none" />
+                  <div className="text-xs text-gray-400 uppercase tracking-widest mb-2 font-semibold">Дараах эможи аль аниме вэ?</div>
+                  <span className="text-5xl sm:text-6xl tracking-widest drop-shadow-md select-all font-sans">{questions[currentQuestionIndex].emojis}</span>
+                </div>
+
+                {/* GAME INPUTS */}
+                {!hasAnswered ? (
+                  playMode === 'options' ? (
+                    /* OPTION MODE BUTTONS */
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                      {questions[currentQuestionIndex].options.map((opt: string) => (
+                        <button
+                          key={opt}
+                          onClick={() => handleAnswer(opt)}
+                          className="w-full py-3.5 px-5 rounded-2xl border border-white/10 bg-white/5 hover:scale-[1.03] hover:bg-white/10 hover:shadow-[0_0_15px_rgba(239,68,68,0.25)] text-left font-bold text-base md:text-lg transition-all duration-300 text-white cursor-pointer"
+                        >
+                          🎯 {opt}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    /* TYPING MODE INPUT */
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        if (typedAnswer.trim()) {
+                          handleAnswer(typedAnswer);
+                        }
+                      }}
+                      className="flex gap-2 w-full"
+                    >
+                      <input
+                        type="text"
+                        value={typedAnswer}
+                        onChange={(e) => setTypedAnswer(e.target.value)}
+                        placeholder="Аниме нэрийг англи эсвэл монголоор бичээд товшоорой..."
+                        autoFocus
+                        className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white font-bold placeholder-gray-500 focus:outline-none focus:border-red-500 focus:bg-white/10 transition-all text-sm sm:text-base"
+                      />
+                      <button
+                        type="submit"
+                        disabled={!typedAnswer.trim()}
+                        className="bg-red-600 hover:bg-red-700 disabled:opacity-40 text-white px-6 rounded-xl font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer text-sm sm:text-base"
+                      >
+                        Таах 🚀
+                      </button>
+                    </form>
+                  )
+                ) : (
+                  /* REVEAL STATE (Answer feedback + Anime Image + YouTube Iframe) */
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-5 md:p-6 animate-blur-fade-up">
+                    
+                    {/* Status Alert Badge */}
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0 ${
+                        isCorrect ? "bg-emerald-600/20 text-emerald-400" : "bg-red-600/20 text-red-500"
+                      }`}>
+                        {isCorrect ? "✅" : "❌"}
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-lg text-white">
+                          {isCorrect ? "Зөв хариуллаа! 🎉" : timeLeft === 0 ? "Хугацаа дууслаа! ⏰" : "Буруу байна! 😢"}
+                        </h4>
+                        <p className="text-xs text-gray-400">
+                          {isCorrect ? "Та +10 оноо авлаа." : "Таны 1 амь хасагдлаа."}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Show Options Feedback (Highlight Correct / Incorrect) */}
+                    {playMode === 'options' && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+                        {questions[currentQuestionIndex].options.map((opt: string) => {
+                          const isThisCorrect = checkAnswer(opt, questions[currentQuestionIndex]);
+                          const isSelected = selectedOption === opt;
+                          
+                          let cardStyle = "border-white/5 bg-white/5 text-gray-500 opacity-60";
+                          if (isThisCorrect) {
+                            cardStyle = "bg-emerald-600/30 border-emerald-500 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.2)]";
+                          } else if (isSelected && !isCorrect) {
+                            cardStyle = "bg-red-600/30 border-red-500 text-red-300 animate-shake shadow-[0_0_15px_rgba(239,68,68,0.2)]";
+                          }
+
+                          return (
+                            <div
+                              key={opt}
+                              className={`py-2 px-4 rounded-xl border font-bold text-sm ${cardStyle}`}
+                            >
+                              {opt} {isThisCorrect && " (Зөв хариулт)"}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Revealing Answers for Typing Mode */}
+                    {playMode === 'type' && (
+                      <div className="bg-black/30 rounded-xl p-3 border border-white/5 mb-4 text-sm">
+                        <span className="text-gray-400 font-medium">Таны бичсэн: </span>
+                        <span className={`font-bold ${isCorrect ? "text-emerald-400" : "text-red-400"}`}>
+                          {selectedOption || "(Хоосон)"}
+                        </span>
+                        <div className="mt-1 text-gray-300">
+                          <span className="text-gray-400 font-medium">Зөв хариулт: </span>
+                          <span className="font-bold text-emerald-400">{questions[currentQuestionIndex].answer}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* REVEAL CONTENT: IMAGE & YOUTUBE VIDEO */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                      {/* Anime Image */}
+                      <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 group">
+                        <img
+                          src={questions[currentQuestionIndex].image}
+                          alt={questions[currentQuestionIndex].answer}
+                          referrerPolicy="no-referrer"
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent flex items-end p-3">
+                          <span className="text-sm font-black text-white drop-shadow">
+                            {questions[currentQuestionIndex].answer}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* YouTube Video Embed */}
+                      <div className="aspect-video rounded-xl overflow-hidden border border-white/10 bg-black">
+                        <iframe
+                          className="w-full h-full"
+                          src={`${questions[currentQuestionIndex].video}?autoplay=1&mute=0`}
+                          title={`${questions[currentQuestionIndex].answer} Trailer`}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        ></iframe>
+                      </div>
+                    </div>
+
+                    {/* Next Question Control */}
+                    <button
+                      onClick={handleNextQuestion}
+                      className="w-full mt-6 bg-white hover:bg-gray-200 text-black font-black py-3.5 rounded-full transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-white/5 active:scale-98"
+                    >
+                      Дараагийн асуулт ({currentQuestionIndex + 1}/{questions.length}) ➔
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* WATCH NOW MODAL */}
       {isPlayingModalOpen && (

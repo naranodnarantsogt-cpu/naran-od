@@ -1,0 +1,23 @@
+{
+  "version": "1.0",
+  "collections": {
+    "scores": {
+      "fields": {
+        "name": { "type": "string" },
+        "score": { "type": "number" },
+        "date": { "type": "string" },
+        "playMode": { "type": "string" },
+        "category": { "type": "string" },
+        "createdAt": { "type": "timestamp" }
+      },
+      "indexes": [
+        {
+          "fields": [
+            { "fieldPath": "score", "order": "DESCENDING" }
+          ]
+        }
+      ],
+      "rules": "allow read, write: if true;"
+    }
+  }
+}

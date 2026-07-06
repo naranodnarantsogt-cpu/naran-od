@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { getTopScoresFromFirestore, saveScoreToFirestore } from './lib/scores';
 import {
   Search,
   User,
@@ -102,6 +103,7 @@ const slides: SlideData[] = [
 const fallbackQuestions = [
   {
     id: 1,
+    category: "emoji",
     emojis: "🏴‍☠️👒🍖⚔️",
     answer: "One Piece",
     options: ["One Piece", "Naruto", "Bleach", "Fairy Tail"],
@@ -111,6 +113,7 @@ const fallbackQuestions = [
   },
   {
     id: 2,
+    category: "emoji",
     emojis: "🦊🍥🍜⚡",
     answer: "Naruto",
     options: ["Naruto", "Boruto", "Dragon Ball Z", "My Hero Academia"],
@@ -120,6 +123,7 @@ const fallbackQuestions = [
   },
   {
     id: 3,
+    category: "emoji",
     emojis: "⚔️👹👺🌊",
     answer: "Demon Slayer",
     options: ["Demon Slayer", "Jujutsu Kaisen", "Attack on Titan", "Tokyo Ghoul"],
@@ -129,6 +133,7 @@ const fallbackQuestions = [
   },
   {
     id: 4,
+    category: "emoji",
     emojis: "🧱🦖⚔️🩸",
     answer: "Attack on Titan",
     options: ["Attack on Titan", "Neon Genesis Evangelion", "Death Note", "Fullmetal Alchemist"],
@@ -138,6 +143,7 @@ const fallbackQuestions = [
   },
   {
     id: 5,
+    category: "emoji",
     emojis: "📓🍎💀✍️",
     answer: "Death Note",
     options: ["Death Note", "Code Geass", "Monster", "Steins;Gate"],
@@ -147,6 +153,7 @@ const fallbackQuestions = [
   },
   {
     id: 6,
+    category: "emoji",
     emojis: "🤞😈🔴👁️",
     answer: "Jujutsu Kaisen",
     options: ["Jujutsu Kaisen", "Chainsaw Man", "Bleach", "Hunter x Hunter"],
@@ -156,6 +163,7 @@ const fallbackQuestions = [
   },
   {
     id: 7,
+    category: "emoji",
     emojis: "🐉🟠🦍⚡",
     answer: "Dragon Ball Z",
     options: ["Dragon Ball Z", "One Punch Man", "My Hero Academia", "Naruto"],
@@ -165,6 +173,7 @@ const fallbackQuestions = [
   },
   {
     id: 8,
+    category: "emoji",
     emojis: "🏫🥦💥🥦",
     answer: "My Hero Academia",
     options: ["My Hero Academia", "Assassination Classroom", "Mob Psycho 100", "Black Clover"],
@@ -174,6 +183,7 @@ const fallbackQuestions = [
   },
   {
     id: 9,
+    category: "emoji",
     emojis: "👨‍🦲🥊🦸‍♂️💥",
     answer: "One Punch Man",
     options: ["One Punch Man", "Dragon Ball", "Hunter x Hunter", "Mob Psycho 100"],
@@ -183,12 +193,53 @@ const fallbackQuestions = [
   },
   {
     id: 10,
+    category: "emoji",
     emojis: "🎣🕷️🃏⚡",
     answer: "Hunter x Hunter",
     options: ["Hunter x Hunter", "Yu Yu Hakusho", "Fullmetal Alchemist", "Bleach"],
     answers: ["hunter x hunter", "hunterxhunter", "hxh", "ангуучдын ангууч", "gon", "гон", "killua", "киллуа"],
     image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLYwY12mnQ4o2D51taXncJf2LGQ-SX4Y63cStG5aZHyA&s=10",
     video: "https://www.youtube.com/embed/d6kBeJjQF08"
+  },
+  {
+    id: 11,
+    category: "character",
+    emojis: "👒🍖🏴‍☠️⚔️",
+    answer: "Luffy",
+    options: ["Luffy", "Zoro", "Sanji", "Usopp"],
+    answers: ["luffy", "monkey d luffy", "луффи", "monkey d. luffy"],
+    image: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&auto=format&fit=crop&q=80",
+    video: "https://www.youtube.com/embed/S8_YwFLCh4U"
+  },
+  {
+    id: 12,
+    category: "character",
+    emojis: "🦊🍥🍜⚡",
+    answer: "Naruto",
+    options: ["Naruto", "Sasuke", "Kakashi", "Gaara"],
+    answers: ["naruto", "naruto uzumaki", "наруто", "наруто узумаки"],
+    image: "https://images.unsplash.com/photo-1618336753974-aae8e04506aa?w=600&auto=format&fit=crop&q=80",
+    video: "https://www.youtube.com/embed/Q6_6S_Q_v9Q"
+  },
+  {
+    id: 13,
+    category: "character",
+    emojis: "⚔️🌊👹🐗",
+    answer: "Tanjiro",
+    options: ["Tanjiro", "Zenitsu", "Inosuke", "Muzan"],
+    answers: ["tanjiro", "tanjiro kamado", "танжиро", "танжиро камадо"],
+    image: "https://images.unsplash.com/photo-1601987177651-8edfe6c20009?w=600&auto=format&fit=crop&q=80",
+    video: "https://www.youtube.com/embed/VQGCKyVZIM4"
+  },
+  {
+    id: 14,
+    category: "character",
+    emojis: "🐉🦍💥🥋",
+    answer: "Goku",
+    options: ["Goku", "Vegeta", "Gohan", "Piccolo"],
+    answers: ["goku", "son goku", "гоку", "сон гоку"],
+    image: "https://images.unsplash.com/photo-1613376023733-0a73315d9b06?w=600&auto=format&fit=crop&q=80",
+    video: "https://www.youtube.com/embed/zghyYV_a29c"
   }
 ];
 
@@ -212,13 +263,9 @@ export default function App() {
 
   // Game state
   const [isGameOpen, setIsGameOpen] = useState(false);
-  const [questions, setQuestions] = useState<any[]>(() => {
-    const shuffledFallback = fallbackQuestions.map((q: any) => ({
-      ...q,
-      options: shuffleArray(q.options || [])
-    }));
-    return shuffleArray(shuffledFallback);
-  });
+  const [questionsRaw, setQuestionsRaw] = useState<any[]>(fallbackQuestions);
+  const [selectedCategory, setSelectedCategory] = useState<'emoji' | 'character' | null>(null);
+  const [questions, setQuestions] = useState<any[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [typedAnswer, setTypedAnswer] = useState("");
@@ -231,28 +278,142 @@ export default function App() {
   const [showBonus, setShowBonus] = useState(false);
   const [playMode, setPlayMode] = useState<'options' | 'type'>('options');
 
+  // Leaderboard states
+  const [leaderboard, setLeaderboard] = useState<{ id: string; name: string; score: number; date?: string; playMode: string; category?: string }[]>(() => {
+    const saved = localStorage.getItem('anime_guess_leaderboard');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    const defaultScores = [
+      { id: 'd1', name: 'Наран Од 👑', score: 250, date: '2026-06-30', playMode: 'type', category: 'emoji' },
+      { id: 'd2', name: 'Gojo Satoru 🤞', score: 180, date: '2026-06-29', playMode: 'type', category: 'emoji' },
+      { id: 'd3', name: 'Tanjiro Kamado 🌊', score: 140, date: '2026-06-28', playMode: 'options', category: 'emoji' },
+      { id: 'd4', name: 'Eren Yeager 🧱', score: 110, date: '2026-06-27', playMode: 'options', category: 'emoji' },
+      { id: 'd5', name: 'Luffy 👒', score: 90, date: '2026-06-26', playMode: 'type', category: 'character' }
+    ];
+    localStorage.setItem('anime_guess_leaderboard', JSON.stringify(defaultScores));
+    return defaultScores;
+  });
+
+  const [playerName, setPlayerName] = useState("Наран Од");
+  const [scoreSubmitted, setScoreSubmitted] = useState(false);
+  const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+  const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
+  const [isSubmittingScore, setIsSubmittingScore] = useState(false);
+  const [leaderboardCategoryFilter, setLeaderboardCategoryFilter] = useState<'all' | 'emoji' | 'character'>('all');
+
+  const submitScoreToLeaderboard = async () => {
+    if (scoreSubmitted || isSubmittingScore) return;
+    setIsSubmittingScore(true);
+    
+    let firestoreId: string | null = null;
+    try {
+      // Save to Firestore!
+      firestoreId = await saveScoreToFirestore(
+        playerName.trim() || "Тоглогч",
+        score,
+        playMode,
+        selectedCategory || 'emoji'
+      );
+    } catch (err) {
+      console.error("Failed to save score to Firestore:", err);
+    }
+    
+    // Refresh leaderboard
+    setIsLoadingLeaderboard(true);
+    let topScores: any[] = [];
+    try {
+      topScores = await getTopScoresFromFirestore();
+    } catch (err) {
+      console.error("Failed to load top scores from Firestore:", err);
+    }
+
+    if (topScores && topScores.length > 0) {
+      setLeaderboard(topScores);
+    } else {
+      // Local fallback if Firestore is temporarily offline/empty
+      const newEntry = {
+        id: firestoreId || Date.now().toString(),
+        name: playerName.trim() || "Тоглогч",
+        score,
+        date: new Date().toISOString().split('T')[0],
+        playMode,
+        category: selectedCategory || 'emoji'
+      };
+      const updated = [...leaderboard, newEntry].sort((a, b) => b.score - a.score);
+      setLeaderboard(updated);
+      localStorage.setItem('anime_guess_leaderboard', JSON.stringify(updated));
+    }
+    
+    setIsLoadingLeaderboard(false);
+    setScoreSubmitted(true);
+    setIsSubmittingScore(false);
+  };
+
   const current = slides[activeSlide];
 
-  // Fetch questions from data.json on mount
+  // Fetch questions from data.json on mount with robust absolute/relative fallbacks
   useEffect(() => {
-    fetch('/data.json')
+    fetch('data.json')
+      .then((res) => {
+        if (!res.ok) return fetch('/data.json');
+        return res;
+      })
       .then((res) => {
         if (!res.ok) throw new Error("HTTP error " + res.status);
         return res.json();
       })
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
-          const processed = data.map((q: any) => ({
-            ...q,
-            options: shuffleArray(q.options || [])
-          }));
-          setQuestions(shuffleArray(processed));
+          setQuestionsRaw(data);
         }
       })
       .catch((err) => {
         console.warn("Could not fetch data.json, using high-quality local fallback questions.", err);
       });
   }, []);
+
+  // Fetch top scores from Firestore on mount
+  useEffect(() => {
+    const fetchScores = async () => {
+      setIsLoadingLeaderboard(true);
+      try {
+        const topScores = await getTopScoresFromFirestore();
+        if (topScores && topScores.length > 0) {
+          setLeaderboard(topScores);
+        }
+      } catch (err) {
+        console.error("Failed to load scores on mount:", err);
+      } finally {
+        setIsLoadingLeaderboard(false);
+      }
+    };
+    fetchScores();
+  }, []);
+
+  // Fetch scores when leaderboard is opened
+  useEffect(() => {
+    if (isLeaderboardOpen) {
+      const fetchScores = async () => {
+        setIsLoadingLeaderboard(true);
+        try {
+          const topScores = await getTopScoresFromFirestore();
+          if (topScores && topScores.length > 0) {
+            setLeaderboard(topScores);
+          }
+        } catch (err) {
+          console.error("Failed to load scores when opening leaderboard:", err);
+        } finally {
+          setIsLoadingLeaderboard(false);
+        }
+      };
+      fetchScores();
+    }
+  }, [isLeaderboardOpen]);
 
   // Play Sound Helper using Web Audio API synthesis
   const playSound = (type: 'correct' | 'incorrect' | 'win' | 'lose') => {
@@ -413,7 +574,7 @@ export default function App() {
     setIsCorrect(null);
     setSelectedOption(null);
     setTypedAnswer("");
-    setTimeLeft(15);
+    setTimeLeft(playMode === 'type' ? 20 : 15);
     setCurrentQuestionIndex((prev) => {
       const nextIndex = prev + 1;
       if (nextIndex >= questions.length) {
@@ -424,25 +585,20 @@ export default function App() {
   };
 
   const resetGame = () => {
+    setSelectedCategory(null);
     setCurrentQuestionIndex(0);
     setHasAnswered(false);
     setIsCorrect(null);
     setSelectedOption(null);
     setTypedAnswer("");
-    setTimeLeft(15);
+    setTimeLeft(playMode === 'type' ? 20 : 15);
     setConsecutiveCorrect(0);
     setLives(3);
     setScore(0);
     setShowBonus(false);
-
-    // Reshuffle both questions and their multiple-choice options on restart
-    setQuestions((prev) => {
-      const reshuffled = prev.map((q: any) => ({
-        ...q,
-        options: shuffleArray(q.options || [])
-      }));
-      return shuffleArray(reshuffled);
-    });
+    setScoreSubmitted(false);
+    setPlayerName("Наран Од");
+    setQuestions([]);
   };
 
   const handleNext = () => {
@@ -526,10 +682,31 @@ export default function App() {
               </button>
             );
           })}
+
+          {/* Typeracer link tab */}
+          <a
+            href="https://narantsogt-naran-od.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-medium tracking-wide transition-all duration-300 animate-blur-fade-up relative py-1 text-gray-400 hover:text-gray-200 flex items-center gap-1.5 cursor-pointer"
+            style={{ animationDelay: '350ms' }}
+          >
+            <span>⌨️ Typeracer</span>
+          </a>
         </div>
 
         {/* Right Buttons */}
         <div className="flex items-center gap-3">
+          {/* Leaderboard Button (sm and up) */}
+          <button
+            onClick={() => setIsLeaderboardOpen(true)}
+            className="hidden sm:flex items-center gap-2 rounded-full liquid-glass px-4 md:px-6 py-2 text-sm font-medium text-white hover:text-gray-200 hover:scale-105 transition-all animate-blur-fade-up active:scale-95 cursor-pointer"
+            style={{ animationDelay: '320ms' }}
+          >
+            <Trophy size={18} className="text-amber-400" />
+            <span>Leaderboard</span>
+          </button>
+
           {/* Search Button (sm and up) */}
           <button
             onClick={() => setIsSearchOpen(true)}
@@ -612,14 +789,34 @@ export default function App() {
             );
           })}
 
-          {/* Search & Profile inside Mobile Menu (visible below sm) */}
-          <div className="sm:hidden mt-3 pt-3 border-t border-gray-800 grid grid-cols-2 gap-3">
+          {/* Typeracer link tab (Mobile) */}
+          <a
+            href="https://narantsogt-naran-od.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="flex items-center justify-between py-3 px-3 rounded-xl text-left transition-colors text-gray-300 hover:bg-gray-800/50 border border-transparent cursor-pointer"
+            style={{
+              transitionDelay: isMobileMenuOpen ? `${slides.length * 50}ms` : '0ms'
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <span className="p-2.5 rounded-lg bg-white/5 text-sm flex items-center justify-center">⌨️</span>
+              <div>
+                <div className="text-sm">⌨️ Typeracer</div>
+                <div className="text-xs text-gray-400">Шивэх хурдны тоглоом</div>
+              </div>
+            </div>
+          </a>
+
+          {/* Search, Leaderboard & Profile inside Mobile Menu (visible below sm) */}
+          <div className="sm:hidden mt-3 pt-3 border-t border-gray-800 grid grid-cols-3 gap-1.5">
             <button
               onClick={() => {
                 setIsMobileMenuOpen(false);
                 setIsSearchOpen(true);
               }}
-              className="flex items-center justify-center gap-2 rounded-xl bg-gray-800/80 py-2.5 px-3 text-sm font-medium text-white"
+              className="flex flex-col items-center justify-center gap-1 rounded-xl bg-gray-800/80 py-2 px-1 text-xs font-medium text-white"
             >
               <Search size={16} className="text-gray-300" />
               <span>Хайх</span>
@@ -627,12 +824,22 @@ export default function App() {
             <button
               onClick={() => {
                 setIsMobileMenuOpen(false);
+                setIsLeaderboardOpen(true);
+              }}
+              className="flex flex-col items-center justify-center gap-1 rounded-xl bg-gray-800/80 py-2 px-1 text-xs font-medium text-white"
+            >
+              <Trophy size={16} className="text-amber-400" />
+              <span>Оноо</span>
+            </button>
+            <button
+              onClick={() => {
+                setIsMobileMenuOpen(false);
                 setIsProfileOpen(true);
               }}
-              className="flex items-center justify-center gap-2 rounded-xl bg-gray-800/80 py-2.5 px-3 text-sm font-medium text-white"
+              className="flex flex-col items-center justify-center gap-1 rounded-xl bg-gray-800/80 py-2 px-1 text-xs font-medium text-white"
             >
               <User size={16} className="text-gray-300" />
-              <span>Наран Од (10)</span>
+              <span>Профайл</span>
             </button>
           </div>
         </div>
@@ -793,31 +1000,190 @@ export default function App() {
               </div>
             )}
 
-            {/* GAME STATE: GAME OVER */}
-            {lives <= 0 ? (
-              <div className="flex flex-col items-center text-center py-8 animate-blur-fade-up">
-                <div className="w-24 h-24 rounded-full bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-500 mb-6 relative">
-                  <div className="absolute inset-0 rounded-full bg-red-600 blur-xl opacity-30 animate-pulse" />
-                  <span className="text-5xl">💀</span>
+            {/* GAME SELECTION / STATE ROUTING */}
+            {selectedCategory === null ? (
+              /* CATEGORY SELECTOR MENU */
+              <div className="flex flex-col items-center text-center py-6 animate-blur-fade-up">
+                <div className="w-16 h-16 rounded-full bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-500 mb-4 relative">
+                  <div className="absolute inset-0 rounded-full bg-red-600/30 blur-lg" />
+                  <Play size={32} className="fill-red-500 ml-1 relative z-10" />
                 </div>
-                <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-2">Тоглоом дууслаа!</h2>
-                <p className="text-gray-400 text-lg mb-6">Таны 3 амь дууслаа. Илүү их аниме үзээрэй! 🍿</p>
+                <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">Тоглоомын цэс</h2>
+                <p className="text-gray-400 text-sm max-w-sm mb-8 font-medium">Таах горимоо сонгон аниме мэдлэгээ сориорой!</p>
                 
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-6 w-full max-w-sm mb-8">
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="text-gray-400 font-medium">Нийт оноо:</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-lg mb-8">
+                  {/* Category: Emoji */}
+                  <button
+                    onClick={() => {
+                      const filtered = questionsRaw.filter(q => q.category === 'emoji');
+                      const processed = filtered.map((q: any) => ({
+                        ...q,
+                        options: shuffleArray(q.options || [])
+                      }));
+                      setQuestions(shuffleArray(processed));
+                      setCurrentQuestionIndex(0);
+                      setSelectedCategory('emoji');
+                      setTimeLeft(playMode === 'type' ? 20 : 15);
+                    }}
+                    className="flex flex-col items-center justify-center p-6 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-red-500/50 hover:scale-[1.02] transition-all duration-300 group cursor-pointer"
+                  >
+                    <span className="text-4xl mb-3 group-hover:scale-110 transition-transform">🎬</span>
+                    <h3 className="font-bold text-white text-base">Аниме Таах (Эможи)</h3>
+                    <p className="text-xs text-gray-500 mt-1 font-medium">Эможи хараад анимэг таана</p>
+                  </button>
+
+                  {/* Category: Character */}
+                  <button
+                    onClick={() => {
+                      const filtered = questionsRaw.filter(q => q.category === 'character');
+                      const processed = filtered.map((q: any) => ({
+                        ...q,
+                        options: shuffleArray(q.options || [])
+                      }));
+                      setQuestions(shuffleArray(processed));
+                      setCurrentQuestionIndex(0);
+                      setSelectedCategory('character');
+                      setTimeLeft(playMode === 'type' ? 20 : 15);
+                    }}
+                    className="flex flex-col items-center justify-center p-6 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-red-500/50 hover:scale-[1.02] transition-all duration-300 group cursor-pointer"
+                  >
+                    <span className="text-4xl mb-3 group-hover:scale-110 transition-transform">🏆</span>
+                    <h3 className="font-bold text-white text-base">Баатрын дүр таах</h3>
+                    <p className="text-xs text-gray-500 mt-1 font-medium">Luffy, Naruto, Tanjiro, Goku-г таана</p>
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => setIsGameOpen(false)}
+                  className="px-6 py-2.5 rounded-full bg-white/10 hover:bg-white/15 text-white text-xs font-semibold transition-all cursor-pointer"
+                >
+                  Буцах
+                </button>
+              </div>
+            ) : lives <= 0 ? (
+              <div className="flex flex-col items-center text-center py-6 animate-blur-fade-up max-h-[80vh] overflow-y-auto">
+                <div className="w-20 h-20 rounded-full bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-500 mb-4 relative shrink-0">
+                  <div className="absolute inset-0 rounded-full bg-red-600 blur-xl opacity-30 animate-pulse" />
+                  <span className="text-4xl">💀</span>
+                </div>
+                <h2 className="text-3xl font-extrabold text-white mb-1">see your score's!</h2>
+                <p className="text-gray-400 text-sm mb-4">Тоглоом дууслаа! Таны 3 амь дууслаа. Илүү их аниме үзээрэй! 🍿</p>
+                
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-4 w-full max-w-sm mb-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400 font-medium text-sm">Нийт оноо:</span>
                     <span className="text-2xl font-black text-amber-400">{score}</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400 font-medium">Асуулт:</span>
-                    <span className="text-lg font-bold text-white">{currentQuestionIndex} / {questions.length}</span>
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-gray-400 font-medium text-sm">Хариулсан асуулт:</span>
+                    <span className="text-base font-bold text-white">{currentQuestionIndex} / {questions.length}</span>
                   </div>
                 </div>
 
-                <div className="flex gap-4">
+                {/* Score Submission */}
+                {!scoreSubmitted ? (
+                  <div className="bg-white/5 border border-red-500/20 rounded-2xl p-4 w-full max-w-sm mb-4">
+                    <label className="block text-xs font-bold text-red-400 uppercase tracking-wider mb-2 text-left">
+                      Таны оноо шилдэг жагсаалтад ороход бэлэн байна!
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={playerName}
+                        onChange={(e) => setPlayerName(e.target.value)}
+                        placeholder="Нэрээ оруулна уу"
+                        maxLength={15}
+                        className="flex-1 bg-black/50 border border-white/20 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-red-500"
+                      />
+                      <button
+                        onClick={submitScoreToLeaderboard}
+                        className="bg-red-600 hover:bg-red-700 text-white text-sm font-bold px-4 py-2 rounded-xl transition-all active:scale-95 cursor-pointer"
+                      >
+                        Оруулах 🏆
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-3 w-full max-w-sm mb-4 text-green-400 text-xs font-semibold text-center">
+                    ✓ Таны оноо амжилттай хадгалагдлаа!
+                  </div>
+                )}
+
+                {/* Mini Leaderboard */}
+                <div className="w-full max-w-sm bg-white/5 border border-white/10 rounded-2xl p-4 mb-5">
+                  <div className="flex items-center justify-between mb-2 pb-1 text-xs font-bold text-gray-400 uppercase tracking-wider border-b border-white/10">
+                    <span>🏆 Шилдэг тоглогчид</span>
+                    <span>Оноо</span>
+                  </div>
+
+                  {/* Mini Filter Tabs */}
+                  <div className="flex bg-white/5 p-1 rounded-xl mb-3 border border-white/5 text-[11px]">
+                    <button
+                      onClick={() => setLeaderboardCategoryFilter('all')}
+                      className={`flex-1 py-1.5 font-bold rounded-lg transition-all cursor-pointer ${
+                        leaderboardCategoryFilter === 'all'
+                          ? 'bg-red-600 text-white'
+                          : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      Бүгд
+                    </button>
+                    <button
+                      onClick={() => setLeaderboardCategoryFilter('emoji')}
+                      className={`flex-1 py-1.5 font-bold rounded-lg transition-all cursor-pointer ${
+                        leaderboardCategoryFilter === 'emoji'
+                          ? 'bg-red-600 text-white'
+                          : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      Эможи
+                    </button>
+                    <button
+                      onClick={() => setLeaderboardCategoryFilter('character')}
+                      className={`flex-1 py-1.5 font-bold rounded-lg transition-all cursor-pointer ${
+                        leaderboardCategoryFilter === 'character'
+                          ? 'bg-red-600 text-white'
+                          : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      Дүр (Chapter)
+                    </button>
+                  </div>
+
+                  <div className="space-y-1.5 max-h-[140px] overflow-y-auto pr-1">
+                    {leaderboard.filter(entry => leaderboardCategoryFilter === 'all' || entry.category === leaderboardCategoryFilter).length === 0 ? (
+                      <div className="text-center py-4 text-gray-500 text-xs">Одоогоор оноо байхгүй байна.</div>
+                    ) : (
+                      leaderboard
+                        .filter(entry => leaderboardCategoryFilter === 'all' || entry.category === leaderboardCategoryFilter)
+                        .slice(0, 5)
+                        .map((entry, idx) => (
+                          <div
+                            key={entry.id}
+                            className={`flex justify-between items-center text-xs py-1.5 px-2 rounded-lg ${
+                              entry.id === leaderboard.find(e => e.name === playerName && e.score === score)?.id
+                                ? 'bg-red-500/20 text-red-300 font-bold border border-red-500/30 animate-pulse'
+                                : 'text-gray-300'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="text-gray-500 font-bold">{idx + 1}.</span>
+                              <span className="truncate max-w-[120px]">{entry.name}</span>
+                              <span className="text-[10px] bg-white/10 text-gray-400 px-1.5 py-0.2 rounded-full font-mono scale-90 shrink-0">
+                                {entry.playMode === 'type' ? 'Бичих' : 'Сонгох'}
+                              </span>
+                            </div>
+                            <span className="font-mono font-bold text-amber-400 shrink-0">{entry.score}</span>
+                          </div>
+                        ))
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex gap-3 w-full max-w-sm justify-center">
                   <button
                     onClick={resetGame}
-                    className="bg-red-600 text-white font-bold rounded-full px-8 py-3.5 hover:bg-red-700 transition-all active:scale-95 shadow-lg shadow-red-600/30 cursor-pointer"
+                    className="flex-1 bg-red-600 text-white font-bold rounded-full py-3 hover:bg-red-700 transition-all active:scale-95 shadow-lg shadow-red-600/30 cursor-pointer text-sm"
                   >
                     Дахин эхлүүлэх 🔄
                   </button>
@@ -826,7 +1192,7 @@ export default function App() {
                       setIsGameOpen(false);
                       resetGame();
                     }}
-                    className="bg-white/10 hover:bg-white/15 text-white font-semibold rounded-full px-8 py-3.5 transition-all cursor-pointer"
+                    className="flex-1 bg-white/10 hover:bg-white/15 text-white font-semibold rounded-full py-3 transition-all cursor-pointer text-sm"
                   >
                     Буцах
                   </button>
@@ -834,33 +1200,133 @@ export default function App() {
               </div>
             ) : currentQuestionIndex >= questions.length ? (
               /* GAME STATE: VICTORY */
-              <div className="flex flex-col items-center text-center py-8 animate-blur-fade-up">
-                <div className="w-24 h-24 rounded-full bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-6 relative">
+              <div className="flex flex-col items-center text-center py-6 animate-blur-fade-up max-h-[80vh] overflow-y-auto">
+                <div className="w-20 h-20 rounded-full bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-4 relative shrink-0">
                   <div className="absolute inset-0 rounded-full bg-amber-500 blur-xl opacity-30 animate-pulse" />
-                  <Trophy size={48} className="animate-bounce" />
+                  <Trophy size={40} className="animate-bounce" />
                 </div>
-                <h2 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-500 mb-2">
-                  БАЯР ХҮРГЭЕ! 🎉
+                <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-500 mb-1 animate-pulse">
+                  see your score's! 🎉
                 </h2>
-                <p className="text-red-400 font-bold text-lg mb-6">Та жинхэнэ Аниме Отаку байна! 👑</p>
+                <p className="text-red-400 font-bold text-sm mb-4">БАЯР ХҮРГЭЕ! Та жинхэнэ Аниме Отаку байна! 👑</p>
                 
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-6 w-full max-w-sm mb-8">
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="text-gray-400 font-medium">Эцсийн оноо:</span>
-                    <span className="text-3xl font-black text-amber-400">{score}</span>
-                  </div>
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-4 w-full max-w-sm mb-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-400 font-medium">Үлдсэн амь:</span>
-                    <span className="text-lg font-bold text-red-500">
+                    <span className="text-gray-400 font-medium text-sm">Эцсийн оноо:</span>
+                    <span className="text-2xl font-black text-amber-400">{score}</span>
+                  </div>
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-gray-400 font-medium text-sm">Үлдсэн амь:</span>
+                    <span className="text-base font-bold text-red-500">
                       {"❤️".repeat(lives)}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex gap-4">
+                {/* Score Submission */}
+                {!scoreSubmitted ? (
+                  <div className="bg-white/5 border border-amber-500/20 rounded-2xl p-4 w-full max-w-sm mb-4">
+                    <label className="block text-xs font-bold text-amber-400 uppercase tracking-wider mb-2 text-left">
+                      Таны оноо шилдэг жагсаалтад ороход бэлэн байна!
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={playerName}
+                        onChange={(e) => setPlayerName(e.target.value)}
+                        placeholder="Нэрээ оруулна уу"
+                        maxLength={15}
+                        className="flex-1 bg-black/50 border border-white/20 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
+                      />
+                      <button
+                        onClick={submitScoreToLeaderboard}
+                        className="bg-gradient-to-r from-amber-500 to-yellow-400 text-black text-sm font-black px-4 py-2 rounded-xl transition-all active:scale-95 cursor-pointer"
+                      >
+                        Оруулах 🏆
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-3 w-full max-w-sm mb-4 text-green-400 text-xs font-semibold text-center">
+                    ✓ Таны оноо амжилттай хадгалагдлаа!
+                  </div>
+                )}
+
+                {/* Mini Leaderboard */}
+                <div className="w-full max-w-sm bg-white/5 border border-white/10 rounded-2xl p-4 mb-5">
+                  <div className="flex items-center justify-between mb-2 pb-1 text-xs font-bold text-gray-400 uppercase tracking-wider border-b border-white/10">
+                    <span>🏆 Шилдэг тоглогчид</span>
+                    <span>Оноо</span>
+                  </div>
+
+                  {/* Mini Filter Tabs */}
+                  <div className="flex bg-white/5 p-1 rounded-xl mb-3 border border-white/5 text-[11px]">
+                    <button
+                      onClick={() => setLeaderboardCategoryFilter('all')}
+                      className={`flex-1 py-1.5 font-bold rounded-lg transition-all cursor-pointer ${
+                        leaderboardCategoryFilter === 'all'
+                          ? 'bg-amber-500 text-black shadow-md'
+                          : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      Бүгд
+                    </button>
+                    <button
+                      onClick={() => setLeaderboardCategoryFilter('emoji')}
+                      className={`flex-1 py-1.5 font-bold rounded-lg transition-all cursor-pointer ${
+                        leaderboardCategoryFilter === 'emoji'
+                          ? 'bg-amber-500 text-black shadow-md'
+                          : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      Эможи
+                    </button>
+                    <button
+                      onClick={() => setLeaderboardCategoryFilter('character')}
+                      className={`flex-1 py-1.5 font-bold rounded-lg transition-all cursor-pointer ${
+                        leaderboardCategoryFilter === 'character'
+                          ? 'bg-amber-500 text-black shadow-md'
+                          : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      Дүр (Chapter)
+                    </button>
+                  </div>
+
+                  <div className="space-y-1.5 max-h-[140px] overflow-y-auto pr-1">
+                    {leaderboard.filter(entry => leaderboardCategoryFilter === 'all' || entry.category === leaderboardCategoryFilter).length === 0 ? (
+                      <div className="text-center py-4 text-gray-500 text-xs">Одоогоор оноо байхгүй байна.</div>
+                    ) : (
+                      leaderboard
+                        .filter(entry => leaderboardCategoryFilter === 'all' || entry.category === leaderboardCategoryFilter)
+                        .slice(0, 5)
+                        .map((entry, idx) => (
+                          <div
+                            key={entry.id}
+                            className={`flex justify-between items-center text-xs py-1.5 px-2 rounded-lg ${
+                              entry.id === leaderboard.find(e => e.name === playerName && e.score === score)?.id
+                                ? 'bg-amber-400/20 text-amber-300 font-bold border border-amber-500/30 animate-pulse'
+                                : 'text-gray-300'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="text-gray-500 font-bold">{idx + 1}.</span>
+                              <span className="truncate max-w-[120px]">{entry.name}</span>
+                              <span className="text-[10px] bg-white/10 text-gray-400 px-1.5 py-0.2 rounded-full font-mono scale-90 shrink-0">
+                                {entry.playMode === 'type' ? 'Бичих' : 'Сонгох'}
+                              </span>
+                            </div>
+                            <span className="font-mono font-bold text-amber-400 shrink-0">{entry.score}</span>
+                          </div>
+                        ))
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex gap-3 w-full max-w-sm justify-center">
                   <button
                     onClick={resetGame}
-                    className="bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-black rounded-full px-8 py-3.5 hover:brightness-110 transition-all active:scale-95 shadow-lg shadow-amber-500/30 cursor-pointer"
+                    className="flex-1 bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-black rounded-full py-3 hover:brightness-110 transition-all active:scale-95 shadow-lg shadow-amber-500/30 cursor-pointer text-sm"
                   >
                     Дахин тоглох 🔄
                   </button>
@@ -869,7 +1335,7 @@ export default function App() {
                       setIsGameOpen(false);
                       resetGame();
                     }}
-                    className="bg-white/10 hover:bg-white/15 text-white font-semibold rounded-full px-8 py-3.5 transition-all cursor-pointer"
+                    className="flex-1 bg-white/10 hover:bg-white/15 text-white font-semibold rounded-full py-3 transition-all cursor-pointer text-sm"
                   >
                     Хаах
                   </button>
@@ -922,7 +1388,10 @@ export default function App() {
                   {!hasAnswered && (
                     <div className="flex bg-white/5 border border-white/10 rounded-lg p-0.5 text-xs">
                       <button
-                        onClick={() => setPlayMode('options')}
+                        onClick={() => {
+                          setPlayMode('options');
+                          setTimeLeft(15);
+                        }}
                         className={`px-3 py-1 rounded-md font-bold transition-all cursor-pointer ${
                           playMode === 'options' ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white'
                         }`}
@@ -930,7 +1399,10 @@ export default function App() {
                         Сонгох 🎯
                       </button>
                       <button
-                        onClick={() => setPlayMode('type')}
+                        onClick={() => {
+                          setPlayMode('type');
+                          setTimeLeft(20);
+                        }}
                         className={`px-3 py-1 rounded-md font-bold transition-all cursor-pointer ${
                           playMode === 'type' ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white'
                         }`}
@@ -955,18 +1427,33 @@ export default function App() {
                         className={`h-full transition-all duration-1000 ${
                           timeLeft <= 5 ? 'bg-red-500 animate-pulse' : 'bg-gradient-to-r from-red-600 to-amber-500'
                         }`}
-                        style={{ width: `${(timeLeft / 15) * 100}%` }}
+                        style={{ width: `${(timeLeft / (playMode === 'type' ? 20 : 15)) * 100}%` }}
                       />
                     </div>
                   </div>
                 )}
 
-                {/* Question: EMOJIS */}
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center mb-6 relative">
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-red-600/10 to-amber-500/10 blur-sm pointer-events-none" />
-                  <div className="text-xs text-gray-400 uppercase tracking-widest mb-2 font-semibold">Дараах эможи аль аниме вэ?</div>
-                  <span className="text-5xl sm:text-6xl tracking-widest drop-shadow-md select-all font-sans">{questions[currentQuestionIndex].emojis}</span>
-                </div>
+                {/* Question Display */}
+                {selectedCategory === 'character' ? (
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col items-center justify-center mb-6 relative overflow-hidden">
+                    <div className="relative aspect-video w-full rounded-xl overflow-hidden border border-white/10 mb-4 bg-gray-900">
+                      <img
+                        src={questions[currentQuestionIndex].image}
+                        alt="Guess the character"
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-contain bg-black/40"
+                      />
+                    </div>
+                    <div className="text-xs text-amber-400 uppercase tracking-widest mb-1 font-bold">Энэ баатрын нэрийг таана уу?</div>
+                    <span className="text-2xl tracking-widest drop-shadow-md font-sans">{questions[currentQuestionIndex].emojis}</span>
+                  </div>
+                ) : (
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center mb-6 relative">
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-red-600/10 to-amber-500/10 blur-sm pointer-events-none" />
+                    <div className="text-xs text-gray-400 uppercase tracking-widest mb-2 font-semibold">Дараах эможи аль аниме вэ?</div>
+                    <span className="text-5xl sm:text-6xl tracking-widest drop-shadow-md select-all font-sans">{questions[currentQuestionIndex].emojis}</span>
+                  </div>
+                )}
 
                 {/* GAME INPUTS */}
                 {!hasAnswered ? (
@@ -1021,7 +1508,7 @@ export default function App() {
                         src={questions[currentQuestionIndex].image}
                         alt={questions[currentQuestionIndex].answer}
                         referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        className="w-full h-full object-contain bg-black/40 transition-transform duration-500 group-hover:scale-105"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent flex items-end p-4">
                         <span className="text-xl font-black text-white drop-shadow">
@@ -1291,6 +1778,121 @@ export default function App() {
               className="w-full py-3.5 rounded-full bg-gradient-to-r from-red-600 to-red-500 text-white font-bold tracking-wide hover:brightness-110 active:scale-98 transition-all shadow-lg shadow-red-600/30"
             >
               Гайхалтай! (Буцах)
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* LEADERBOARD MODAL */}
+      {isLeaderboardOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-2xl animate-fade-in animate-blur-fade-up">
+          <div className="relative w-full max-w-md bg-gradient-to-b from-gray-900 to-black border border-gray-800 rounded-3xl overflow-hidden shadow-2xl p-6 sm:p-8 flex flex-col max-h-[85vh]">
+            <button
+              onClick={() => setIsLeaderboardOpen(false)}
+              className="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors text-white cursor-pointer"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="text-center mb-4">
+              <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 relative shrink-0">
+                <div className="absolute inset-0 rounded-full bg-amber-500 blur-xl opacity-30 animate-pulse" />
+                <Trophy size={32} className="animate-bounce" />
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Аниме Отакуудын Жагсаалт</h2>
+              <p className="text-gray-400 text-sm mt-1">Хамгийн өндөр оноотой шилдэг тоглогчид</p>
+            </div>
+
+            {/* Category Filter Tabs */}
+            <div className="flex bg-white/5 p-1 rounded-2xl mb-4 border border-white/5">
+              <button
+                onClick={() => setLeaderboardCategoryFilter('all')}
+                className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+                  leaderboardCategoryFilter === 'all'
+                    ? 'bg-red-600 text-white shadow-md'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                Бүгд (All)
+              </button>
+              <button
+                onClick={() => setLeaderboardCategoryFilter('emoji')}
+                className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+                  leaderboardCategoryFilter === 'emoji'
+                    ? 'bg-red-600 text-white shadow-md'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                Эможи (Emoji)
+              </button>
+              <button
+                onClick={() => setLeaderboardCategoryFilter('character')}
+                className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+                  leaderboardCategoryFilter === 'character'
+                    ? 'bg-red-600 text-white shadow-md'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                Дүр (Chapter)
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto pr-1 space-y-2 mb-6">
+              {leaderboard.filter(entry => leaderboardCategoryFilter === 'all' || entry.category === leaderboardCategoryFilter).length === 0 ? (
+                <div className="text-center py-8 text-gray-500 text-sm">Одоогоор энэ ангилалд оноо байхгүй байна. 🚀</div>
+              ) : (
+                leaderboard
+                  .filter(entry => leaderboardCategoryFilter === 'all' || entry.category === leaderboardCategoryFilter)
+                  .slice(0, 10)
+                  .map((entry, idx) => {
+                    const isTop3 = idx < 3;
+                    const medalColors = ['from-yellow-400 to-amber-500 text-black', 'from-slate-300 to-slate-400 text-black', 'from-amber-600 to-amber-800 text-white'];
+                    return (
+                      <div
+                        key={entry.id}
+                        className={`flex items-center justify-between p-3.5 rounded-2xl border transition-all ${
+                          entry.name.includes("Наран Од")
+                            ? 'bg-red-600/10 border-red-500/30'
+                            : 'bg-white/5 border-white/5 hover:border-white/10'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          {isTop3 ? (
+                            <div className={`w-7 h-7 rounded-full bg-gradient-to-br ${medalColors[idx]} font-black text-xs flex items-center justify-center shrink-0`}>
+                              {idx + 1}
+                            </div>
+                          ) : (
+                            <div className="w-7 h-7 font-bold text-xs text-gray-500 flex items-center justify-center shrink-0">
+                              {idx + 1}
+                            </div>
+                          )}
+                          <span className="font-bold text-white truncate text-sm sm:text-base">
+                            {entry.name}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                          <span className="text-[10px] bg-red-500/10 border border-red-500/20 px-1.5 py-0.5 rounded-full text-red-400 font-medium scale-90 shrink-0">
+                            {entry.category === 'character' ? 'Дүр' : 'Эможи'}
+                          </span>
+                          <span className="text-[10px] sm:text-xs bg-white/5 border border-white/10 px-1.5 sm:px-2 py-0.5 rounded-full text-gray-400 font-mono">
+                            {entry.playMode === 'type' ? 'Бичих ✍️' : 'Сонгох 🎯'}
+                          </span>
+                          <span className="font-mono text-sm sm:text-base font-black text-amber-400 ml-1">
+                            {entry.score}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })
+              )}
+            </div>
+
+            <button
+              onClick={() => setIsLeaderboardOpen(false)}
+              className="w-full py-3.5 rounded-full bg-white text-black font-bold tracking-wide hover:bg-gray-200 active:scale-98 transition-all shadow-lg cursor-pointer shrink-0"
+            >
+              Хаах (Тоглоом руу буцах)
             </button>
           </div>
         </div>

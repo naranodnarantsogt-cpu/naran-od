@@ -51,6 +51,18 @@ const slides: SlideData[] = [
     icon: <Film className="w-4 h-4 text-amber-400 inline mr-1.5" />
   },
   {
+    category: "My Games",
+    navTitle: "Миний тоглоомууд",
+    rating: "10/10 Game",
+    duration: "Хязгааргүй",
+    date: "Тоглоом",
+    title: "Миний тоглоомууд",
+    subtitle: "Аниме ба Эможи таах тоглоом",
+    description: "Наран одын бүтээсэн хөгжилтэй аниме болон баатрын дүр таах тоглоом. Энд дарж шууд тоглоорой!",
+    tag: "Тоглоом",
+    icon: <Play className="w-4 h-4 text-red-400 inline mr-1.5" />
+  },
+  {
     category: "TV Series",
     navTitle: "TV Series",
     rating: "9.9/10 Crunchyroll",
@@ -720,11 +732,17 @@ export default function App() {
           {/* User / Profile Button (sm and up) */}
           <button
             onClick={() => setIsProfileOpen(true)}
-            className="hidden sm:flex w-10 h-10 items-center justify-center rounded-full liquid-glass text-white hover:scale-105 transition-all animate-blur-fade-up active:scale-95 group"
+            className="hidden sm:flex items-center gap-3 rounded-full liquid-glass px-4 py-2 text-white hover:scale-105 transition-all animate-blur-fade-up active:scale-95 group cursor-pointer"
             style={{ animationDelay: '400ms' }}
             title="Миний профайл"
           >
-            <User size={18} className="text-gray-300 group-hover:text-white transition-colors" />
+            <div className="w-8 h-8 rounded-full bg-red-600/30 flex items-center justify-center text-red-400 group-hover:bg-red-600/50 transition-colors">
+              <User size={16} />
+            </div>
+            <div className="text-left">
+              <div className="text-xs font-bold leading-tight text-white">Наран Од</div>
+              <div className="text-[10px] text-gray-400 leading-tight">10 настай</div>
+            </div>
           </button>
 
           {/* Hamburger Menu Button (below lg) */}
@@ -850,89 +868,518 @@ export default function App() {
         <div className="flex flex-col md:flex-row items-end justify-between gap-8 w-full max-w-7xl">
           {/* Left Side Content - Keyed by activeSlide for re-triggering stagger animations */}
           <div key={`hero-left-${activeSlide}`} className="flex-1 w-full max-w-3xl">
-            {/* Category Tag Badge */}
-            <div
-              className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-red-600/30 border border-red-500/40 text-red-300 text-xs font-semibold mb-4 uppercase tracking-wider animate-blur-fade-up"
-              style={{ animationDelay: '250ms' }}
-            >
-              {current.icon}
-              <span>{current.tag}</span>
-            </div>
+            {activeSlide === 1 ? (
+              /* DIRECT EMBEDDED GAME INTERFACE FOR "МИНИЙ ТОГЛООМУУД" */
+              <div className="relative w-full max-w-2xl bg-gray-950/90 border border-white/10 rounded-3xl overflow-hidden shadow-2xl p-6 md:p-8 flex flex-col backdrop-blur-xl">
+                {/* STREAK BONUS ANIMATED BANNER */}
+                {showBonus && (
+                  <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20 bg-gradient-to-r from-amber-500 to-red-600 text-white px-6 py-2 rounded-full font-black tracking-widest text-sm shadow-2xl shadow-red-500/50 flex items-center gap-2 animate-bounce">
+                    🔥 ДАРААЛАН 3 ЗӨВ! БОНУС +20 ОНОО! 🔥
+                  </div>
+                )}
 
-            {/* Metadata Row */}
-            <div
-              className="flex flex-wrap items-center gap-3 sm:gap-6 mb-6 md:mb-8 text-xs sm:text-sm text-gray-300 animate-blur-fade-up"
-              style={{ animationDelay: '300ms' }}
-            >
-              <div className="flex items-center gap-1.5 bg-white/10 px-2.5 py-1 rounded-md backdrop-blur-md">
-                <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-amber-400 text-amber-400" />
-                <span className="font-semibold text-white">{current.rating}</span>
+                {/* GAME SELECTION / STATE ROUTING */}
+                {selectedCategory === null ? (
+                  /* CATEGORY SELECTOR MENU */
+                  <div className="flex flex-col items-center text-center py-6 animate-blur-fade-up">
+                    <div className="w-16 h-16 rounded-full bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-500 mb-4 relative">
+                      <div className="absolute inset-0 rounded-full bg-red-600/30 blur-lg" />
+                      <Play size={32} className="fill-red-500 ml-1 relative z-10" />
+                    </div>
+                    <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">Миний тоглоомууд</h2>
+                    <p className="text-gray-400 text-sm max-w-sm mb-8 font-medium">Таах горимоо сонгон аниме мэдлэгээ сориорой!</p>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-lg mb-8">
+                      {/* Category: Emoji */}
+                      <button
+                        onClick={() => {
+                          const filtered = questionsRaw.filter(q => q.category === 'emoji');
+                          const processed = filtered.map((q: any) => ({
+                            ...q,
+                            options: shuffleArray(q.options || [])
+                          }));
+                          setQuestions(shuffleArray(processed));
+                          setCurrentQuestionIndex(0);
+                          setSelectedCategory('emoji');
+                          setTimeLeft(playMode === 'type' ? 20 : 15);
+                        }}
+                        className="flex flex-col items-center justify-center p-6 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-red-500/50 hover:scale-[1.02] transition-all duration-300 group cursor-pointer"
+                      >
+                        <span className="text-4xl mb-3 group-hover:scale-110 transition-transform">🎬</span>
+                        <h3 className="font-bold text-white text-base">Аниме Таах (Эможи)</h3>
+                        <p className="text-xs text-gray-500 mt-1 font-medium">Эможи хараад анимэг таана</p>
+                      </button>
+
+                      {/* Category: Character */}
+                      <button
+                        onClick={() => {
+                          const filtered = questionsRaw.filter(q => q.category === 'character');
+                          const processed = filtered.map((q: any) => ({
+                            ...q,
+                            options: shuffleArray(q.options || [])
+                          }));
+                          setQuestions(shuffleArray(processed));
+                          setCurrentQuestionIndex(0);
+                          setSelectedCategory('character');
+                          setTimeLeft(playMode === 'type' ? 20 : 15);
+                        }}
+                        className="flex flex-col items-center justify-center p-6 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-red-500/50 hover:scale-[1.02] transition-all duration-300 group cursor-pointer"
+                      >
+                        <span className="text-4xl mb-3 group-hover:scale-110 transition-transform">🏆</span>
+                        <h3 className="font-bold text-white text-base">Баатрын дүр таах</h3>
+                        <p className="text-xs text-gray-500 mt-1 font-medium">Luffy, Naruto, Tanjiro, Goku-г таана</p>
+                      </button>
+                    </div>
+                  </div>
+                ) : lives <= 0 ? (
+                  <div className="flex flex-col items-center text-center py-6 animate-blur-fade-up max-h-[80vh] overflow-y-auto">
+                    <div className="w-20 h-20 rounded-full bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-500 mb-4 relative shrink-0">
+                      <div className="absolute inset-0 rounded-full bg-red-600 blur-xl opacity-30 animate-pulse" />
+                      <span className="text-4xl">💀</span>
+                    </div>
+                    <h2 className="text-3xl font-extrabold text-white mb-1">see your score's!</h2>
+                    <p className="text-gray-400 text-sm mb-4">Тоглоом дууслаа! Таны 3 амь дууслаа. Илүү их аниме үзээрэй! 🍿</p>
+                    
+                    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 w-full max-w-sm mb-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-400 font-medium text-sm">Нийт оноо:</span>
+                        <span className="text-2xl font-black text-amber-400">{score}</span>
+                      </div>
+                      <div className="flex justify-between items-center mt-2">
+                        <span className="text-gray-400 font-medium text-sm">Хариулсан асуулт:</span>
+                        <span className="text-base font-bold text-white">{currentQuestionIndex} / {questions.length}</span>
+                      </div>
+                    </div>
+
+                    {/* Score Submission */}
+                    {!scoreSubmitted ? (
+                      <div className="bg-white/5 border border-red-500/20 rounded-2xl p-4 w-full max-w-sm mb-4">
+                        <label className="block text-xs font-bold text-red-400 uppercase tracking-wider mb-2 text-left">
+                          Таны оноо шилдэг жагсаалтад ороход бэлэн байна!
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={playerName}
+                            onChange={(e) => setPlayerName(e.target.value)}
+                            placeholder="Нэрээ оруулна уу"
+                            maxLength={15}
+                            className="flex-1 bg-black/50 border border-white/20 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-red-500"
+                          />
+                          <button
+                            onClick={submitScoreToLeaderboard}
+                            className="bg-red-600 hover:bg-red-700 text-white text-sm font-bold px-4 py-2 rounded-xl transition-all active:scale-95 cursor-pointer"
+                          >
+                            Оруулах 🏆
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-3 w-full max-w-sm mb-4 text-green-400 text-xs font-semibold text-center">
+                        ✓ Таны оноо амжилттай хадгалагдлаа!
+                      </div>
+                    )}
+
+                    <div className="flex gap-3 w-full max-w-sm justify-center">
+                      <button
+                        onClick={resetGame}
+                        className="flex-1 bg-red-600 text-white font-bold rounded-full py-3 hover:bg-red-700 transition-all active:scale-95 shadow-lg shadow-red-600/30 cursor-pointer text-sm"
+                      >
+                        Дахин эхлүүлэх 🔄
+                      </button>
+                    </div>
+                  </div>
+                ) : currentQuestionIndex >= questions.length ? (
+                  <div className="flex flex-col items-center text-center py-6 animate-blur-fade-up max-h-[80vh] overflow-y-auto">
+                    <div className="w-20 h-20 rounded-full bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-4 relative shrink-0">
+                      <div className="absolute inset-0 rounded-full bg-amber-500 blur-xl opacity-30 animate-pulse" />
+                      <Trophy size={40} className="animate-bounce" />
+                    </div>
+                    <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-500 mb-1 animate-pulse">
+                      see your score's! 🎉
+                    </h2>
+                    <p className="text-red-400 font-bold text-sm mb-4">БАЯР ХҮРГЭЕ! Та жинхэнэ Аниме Отаку байна! 👑</p>
+                    
+                    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 w-full max-w-sm mb-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-400 font-medium text-sm">Эцсийн оноо:</span>
+                        <span className="text-2xl font-black text-amber-400">{score}</span>
+                      </div>
+                      <div className="flex justify-between items-center mt-2">
+                        <span className="text-gray-400 font-medium text-sm">Үлдсэн амь:</span>
+                        <span className="text-base font-bold text-red-500">
+                          {"❤️".repeat(lives)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Score Submission */}
+                    {!scoreSubmitted ? (
+                      <div className="bg-white/5 border border-amber-500/20 rounded-2xl p-4 w-full max-w-sm mb-4">
+                        <label className="block text-xs font-bold text-amber-400 uppercase tracking-wider mb-2 text-left">
+                          Таны оноо шилдэг жагсаалтад ороход бэлэн байна!
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={playerName}
+                            onChange={(e) => setPlayerName(e.target.value)}
+                            placeholder="Нэрээ оруулна уу"
+                            maxLength={15}
+                            className="flex-1 bg-black/50 border border-white/20 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
+                          />
+                          <button
+                            onClick={submitScoreToLeaderboard}
+                            className="bg-gradient-to-r from-amber-500 to-yellow-400 text-black text-sm font-black px-4 py-2 rounded-xl transition-all active:scale-95 cursor-pointer"
+                          >
+                            Оруулах 🏆
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-3 w-full max-w-sm mb-4 text-green-400 text-xs font-semibold text-center">
+                        ✓ Таны оноо амжилттай хадгалагдлаа!
+                      </div>
+                    )}
+
+                    <div className="flex gap-3 w-full max-w-sm justify-center">
+                      <button
+                        onClick={resetGame}
+                        className="flex-1 bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-black rounded-full py-3 hover:brightness-110 transition-all active:scale-95 shadow-lg shadow-amber-500/30 cursor-pointer text-sm"
+                      >
+                        Дахин тоглох 🔄
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div key={`question-${currentQuestionIndex}`} className="flex flex-col animate-blur-fade-up max-h-[80vh] overflow-y-auto">
+                    {/* Game HUD (Score, Lives, Streak) */}
+                    <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+                      <div className="flex flex-col">
+                        <span className="text-xs text-gray-500 uppercase font-bold tracking-wider">Оноо</span>
+                        <span className="text-xl font-black text-amber-400 flex items-center gap-1.5">
+                          🏆 {score}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-col items-center">
+                        <span className="text-xs text-gray-500 uppercase font-bold tracking-wider">Амь</span>
+                        <div className="flex gap-1 text-lg">
+                          {Array.from({ length: 3 }).map((_, i) => (
+                            <span
+                              key={i}
+                              className={`transition-all duration-300 ${
+                                i < lives ? "opacity-100 scale-100 filter-none" : "opacity-30 scale-75 grayscale"
+                              }`}
+                            >
+                              ❤️
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col items-end">
+                        <span className="text-xs text-gray-500 uppercase font-bold tracking-wider">Дараалсан зөв</span>
+                        <span className="text-lg font-extrabold text-red-500 flex items-center gap-1">
+                          🔥 {consecutiveCorrect}/3
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Question Info & Modes */}
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-sm font-semibold bg-red-600/30 text-red-300 px-3 py-1 rounded-full border border-red-500/30">
+                        Асуулт {currentQuestionIndex + 1} / {questions.length}
+                      </span>
+
+                      {!hasAnswered && (
+                        <div className="flex bg-white/5 border border-white/10 rounded-lg p-0.5 text-xs">
+                          <button
+                            onClick={() => {
+                              setPlayMode('options');
+                              setTimeLeft(15);
+                            }}
+                            className={`px-3 py-1 rounded-md font-bold transition-all cursor-pointer ${
+                              playMode === 'options' ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white'
+                            }`}
+                          >
+                            Сонгох 🎯
+                          </button>
+                          <button
+                            onClick={() => {
+                              setPlayMode('type');
+                              setTimeLeft(20);
+                            }}
+                            className={`px-3 py-1 rounded-md font-bold transition-all cursor-pointer ${
+                              playMode === 'type' ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white'
+                            }`}
+                          >
+                            Бичих ✍️
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Timer Bar */}
+                    {!hasAnswered && (
+                      <div className="mb-4">
+                        <div className="flex justify-between items-center text-xs text-gray-400 mb-1">
+                          <span>Үлдсэн хугацаа:</span>
+                          <span className={`font-mono font-bold ${timeLeft <= 5 ? 'text-red-500 animate-pulse text-sm' : 'text-white'}`}>
+                            {timeLeft} сек
+                          </span>
+                        </div>
+                        <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full transition-all duration-1000 ${
+                              timeLeft <= 5 ? 'bg-red-500 animate-pulse' : 'bg-gradient-to-r from-red-600 to-amber-500'
+                            }`}
+                            style={{ width: `${(timeLeft / (playMode === 'type' ? 20 : 15)) * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Question Display */}
+                    {selectedCategory === 'character' ? (
+                      <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col items-center justify-center mb-6 relative overflow-hidden">
+                        <div className="relative aspect-video w-full rounded-xl overflow-hidden border border-white/10 mb-4 bg-gray-900">
+                          <img
+                            src={questions[currentQuestionIndex].image}
+                            alt="Guess the character"
+                            referrerPolicy="no-referrer"
+                            className="w-full h-full object-contain bg-black/40"
+                          />
+                        </div>
+                        <div className="text-xs text-amber-400 uppercase tracking-widest mb-1 font-bold">Энэ баатрын нэрийг таана уу?</div>
+                        <span className="text-2xl tracking-widest drop-shadow-md font-sans">{questions[currentQuestionIndex].emojis}</span>
+                      </div>
+                    ) : (
+                      <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col items-center justify-center mb-6 relative">
+                        <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-red-600/10 to-amber-500/10 blur-sm pointer-events-none" />
+                        <div className="text-xs text-gray-400 uppercase tracking-widest mb-2 font-semibold">Дараах эможи аль аниме вэ?</div>
+                        <span className="text-5xl sm:text-6xl tracking-widest drop-shadow-md select-all font-sans">{questions[currentQuestionIndex].emojis}</span>
+                      </div>
+                    )}
+
+                    {/* GAME INPUTS */}
+                    {!hasAnswered ? (
+                      playMode === 'options' ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                          {questions[currentQuestionIndex].options.map((opt: string) => (
+                            <button
+                              key={opt}
+                              onClick={() => handleAnswer(opt)}
+                              className="w-full py-3.5 px-5 rounded-2xl border border-white/10 bg-white/5 hover:scale-[1.03] hover:bg-white/10 hover:shadow-[0_0_15px_rgba(239,68,68,0.25)] text-left font-bold text-base md:text-lg transition-all duration-300 text-white cursor-pointer"
+                            >
+                              🎯 {opt}
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <form
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            if (typedAnswer.trim()) {
+                              handleAnswer(typedAnswer);
+                            }
+                          }}
+                          className="flex gap-2 w-full"
+                        >
+                          <input
+                            type="text"
+                            value={typedAnswer}
+                            onChange={(e) => setTypedAnswer(e.target.value)}
+                            placeholder="Аниме нэрийг англи эсвэл монголоор бичээд товшоорой..."
+                            autoFocus
+                            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white font-bold placeholder-gray-500 focus:outline-none focus:border-red-500 focus:bg-white/10 transition-all text-sm sm:text-base"
+                          />
+                          <button
+                            type="submit"
+                            disabled={!typedAnswer.trim()}
+                            className="bg-red-600 hover:bg-red-700 disabled:opacity-40 text-white px-6 rounded-xl font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer text-sm sm:text-base"
+                          >
+                            Таах 🚀
+                          </button>
+                        </form>
+                      )
+                    ) : (
+                      <div className="bg-white/5 border border-white/10 rounded-2xl p-5 md:p-6 animate-blur-fade-up">
+                        <div className="relative aspect-video w-full rounded-xl overflow-hidden border border-white/10 mb-5 group">
+                          <img
+                            src={questions[currentQuestionIndex].image}
+                            alt={questions[currentQuestionIndex].answer}
+                            referrerPolicy="no-referrer"
+                            className="w-full h-full object-contain bg-black/40 transition-transform duration-500 group-hover:scale-105"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent flex items-end p-4">
+                            <span className="text-xl font-black text-white drop-shadow">
+                              {questions[currentQuestionIndex].answer}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0 ${
+                            isCorrect ? "bg-emerald-600/20 text-emerald-400" : "bg-red-600/20 text-red-500"
+                          }`}>
+                            {isCorrect ? "✅" : "❌"}
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-lg text-white">
+                              {isCorrect ? "Зөв хариуллаа! 🎉" : timeLeft === 0 ? "Хугацаа дууслаа! ⏰" : "Буруу байна! 😢"}
+                            </h4>
+                            <p className="text-xs text-gray-400">
+                              {isCorrect ? "Та +10 оноо авлаа." : "Таны 1 амь хасагдлаа."}
+                            </p>
+                          </div>
+                        </div>
+
+                        {playMode === 'options' && (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+                            {questions[currentQuestionIndex].options.map((opt: string) => {
+                              const isThisCorrect = checkAnswer(opt, questions[currentQuestionIndex]);
+                              const isSelected = selectedOption === opt;
+                              
+                              let cardStyle = "border-white/5 bg-white/5 text-gray-500 opacity-60";
+                              if (isThisCorrect) {
+                                cardStyle = "bg-emerald-600/30 border-emerald-500 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.2)]";
+                              } else if (isSelected && !isCorrect) {
+                                cardStyle = "bg-red-600/30 border-red-500 text-red-300 animate-shake shadow-[0_0_15px_rgba(239,68,68,0.2)]";
+                              }
+
+                              return (
+                                <div
+                                  key={opt}
+                                  className={`py-2 px-4 rounded-xl border font-bold text-sm ${cardStyle}`}
+                                >
+                                  {opt} {isThisCorrect && " (Зөв хариулт)"}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+
+                        {playMode === 'type' && (
+                          <div className="bg-black/30 rounded-xl p-3 border border-white/5 mb-4 text-sm">
+                            <span className="text-gray-400 font-medium">Таны бичсэн: </span>
+                            <span className={`font-bold ${isCorrect ? "text-emerald-400" : "text-red-400"}`}>
+                              {selectedOption || "(Хоосон)"}
+                            </span>
+                            <div className="mt-1 text-gray-300">
+                              <span className="text-gray-400 font-medium">Зөв хариулт: </span>
+                              <span className="font-bold text-emerald-400">{questions[currentQuestionIndex].answer}</span>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="mt-4">
+                          <div className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-2">Аниме Трейлер:</div>
+                          <div className="aspect-video w-full rounded-xl overflow-hidden border border-white/10 bg-black">
+                            <iframe
+                              className="w-full h-full"
+                              src={`${questions[currentQuestionIndex].video}?autoplay=1&mute=0`}
+                              title={`${questions[currentQuestionIndex].answer} Trailer`}
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            ></iframe>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={handleNextQuestion}
+                          className="w-full mt-6 bg-white hover:bg-gray-200 text-black font-black py-3.5 rounded-full transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-white/5 active:scale-98"
+                        >
+                          Дараагийн асуулт ({currentQuestionIndex + 1}/{questions.length}) ➔
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
+            ) : (
+              <>
+                {/* Category Tag Badge */}
+                <div
+                  className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-red-600/30 border border-red-500/40 text-red-300 text-xs font-semibold mb-4 uppercase tracking-wider animate-blur-fade-up"
+                  style={{ animationDelay: '250ms' }}
+                >
+                  {current.icon}
+                  <span>{current.tag}</span>
+                </div>
 
-              <div className="flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-gray-400" />
-                <span>{current.duration}</span>
-              </div>
+                {/* Metadata Row */}
+                <div
+                  className="flex flex-wrap items-center gap-3 sm:gap-6 mb-6 md:mb-8 text-xs sm:text-sm text-gray-300 animate-blur-fade-up"
+                  style={{ animationDelay: '300ms' }}
+                >
+                  <div className="flex items-center gap-1.5 bg-white/10 px-2.5 py-1 rounded-md backdrop-blur-md">
+                    <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-amber-400 text-amber-400" />
+                    <span className="font-semibold text-white">{current.rating}</span>
+                  </div>
 
-              <div className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-gray-400" />
-                <span>{current.date}</span>
-              </div>
-            </div>
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="w-4 h-4 text-gray-400" />
+                    <span>{current.duration}</span>
+                  </div>
 
-            {/* Subtitle Accent */}
-            <div
-              className="text-sm sm:text-base md:text-lg font-medium text-red-400 tracking-wide mb-1 md:mb-2 animate-blur-fade-up"
-              style={{ animationDelay: '350ms' }}
-            >
-              {current.subtitle}
-            </div>
+                  <div className="flex items-center gap-1.5">
+                    <Calendar className="w-4 h-4 text-gray-400" />
+                    <span>{current.date}</span>
+                  </div>
+                </div>
 
-            {/* Title */}
-            <h1
-              className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-normal text-white mb-4 md:mb-6 animate-blur-fade-up drop-shadow-md leading-[1.1]"
-              style={{
-                letterSpacing: '-0.04em',
-                animationDelay: '400ms'
-              }}
-            >
-              {current.title}
-            </h1>
+                {/* Subtitle Accent */}
+                <div
+                  className="text-sm sm:text-base md:text-lg font-medium text-red-400 tracking-wide mb-1 md:mb-2 animate-blur-fade-up"
+                  style={{ animationDelay: '350ms' }}
+                >
+                  {current.subtitle}
+                </div>
 
-            {/* Description */}
-            <p
-              className="text-base sm:text-lg md:text-xl text-gray-400 mb-6 md:mb-12 max-w-2xl animate-blur-fade-up leading-relaxed"
-              style={{ animationDelay: '500ms' }}
-            >
-              {current.description}
-            </p>
+                {/* Title */}
+                <h1
+                  className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-normal text-white mb-4 md:mb-6 animate-blur-fade-up drop-shadow-md leading-[1.1]"
+                  style={{
+                    letterSpacing: '-0.04em',
+                    animationDelay: '400ms'
+                  }}
+                >
+                  {current.title}
+                </h1>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-              <button
-                onClick={() => {
-                  if (activeSlide === 1) {
-                    setIsGameOpen(true);
-                  } else {
-                    setIsPlayingModalOpen(true);
-                  }
-                }}
-                className="flex items-center gap-2.5 bg-white text-black rounded-full font-medium px-6 sm:px-8 py-2.5 sm:py-3 hover:bg-gray-200 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-white/10 animate-blur-fade-up cursor-pointer"
-                style={{ animationDelay: '600ms' }}
-              >
-                <Play size={18} className="fill-black text-black" />
-                <span>Play Now</span>
-              </button>
+                {/* Description */}
+                <p
+                  className="text-base sm:text-lg md:text-xl text-gray-400 mb-6 md:mb-12 max-w-2xl animate-blur-fade-up leading-relaxed"
+                  style={{ animationDelay: '500ms' }}
+                >
+                  {current.description}
+                </p>
 
-              <button
-                onClick={() => setIsProfileOpen(true)}
-                className="flex items-center gap-2 rounded-full font-medium liquid-glass px-6 sm:px-8 py-2.5 sm:py-3 text-white hover:text-gray-200 hover:scale-105 active:scale-95 transition-all animate-blur-fade-up cursor-pointer"
-                style={{ animationDelay: '700ms' }}
-              >
-                <Info size={18} className="text-gray-300" />
-                <span>Learn More</span>
-              </button>
-            </div>
+                {/* CTA Buttons */}
+                <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                  <button
+                    onClick={() => {
+                      setActiveSlide(1);
+                    }}
+                    className="flex items-center gap-2.5 bg-white text-black rounded-full font-medium px-6 sm:px-8 py-2.5 sm:py-3 hover:bg-gray-200 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-white/10 animate-blur-fade-up cursor-pointer"
+                    style={{ animationDelay: '600ms' }}
+                  >
+                    <Play size={18} className="fill-black text-black" />
+                    <span>Play Now</span>
+                  </button>
+
+                  <button
+                    onClick={() => setIsProfileOpen(true)}
+                    className="flex items-center gap-2 rounded-full font-medium liquid-glass px-6 sm:px-8 py-2.5 sm:py-3 text-white hover:text-gray-200 hover:scale-105 active:scale-95 transition-all animate-blur-fade-up cursor-pointer"
+                    style={{ animationDelay: '700ms' }}
+                  >
+                    <Info size={18} className="text-gray-300" />
+                    <span>Learn More</span>
+                  </button>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Right Side - Navigation Arrows */}

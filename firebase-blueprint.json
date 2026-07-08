@@ -18,6 +18,23 @@
         }
       ],
       "rules": "allow read, write: if true;"
+    },
+    "football_scores": {
+      "fields": {
+        "name": { "type": "string" },
+        "score": { "type": "number" },
+        "aiScore": { "type": "number" },
+        "teamSize": { "type": "number" },
+        "createdAt": { "type": "timestamp" }
+      },
+      "indexes": [
+        {
+          "fields": [
+            { "fieldPath": "score", "order": "DESCENDING" }
+          ]
+        }
+      ],
+      "rules": "allow read, write: if true;"
     }
   }
 }

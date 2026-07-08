@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
-import { getTopScoresFromFirestore, saveScoreToFirestore } from './lib/scores';
+import React, { useState, useEffect, useRef } from 'react';
+import { getTopScoresFromFirestore, saveScoreToFirestore, getTopFootballScoresFromFirestore, saveFootballScoreToFirestore, FootballScoreEntry } from './lib/scores';
 import {
   Search,
   User,
@@ -23,6 +23,37 @@ import {
   Sparkles,
   Heart
 } from 'lucide-react';
+
+const favoriteMovies = [
+  { 
+    title: "Teach You A Lesson", 
+    rating: "9.8", 
+    genre: "Драма", 
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQqGMBDqKfk7q0JEuVEWPQjPuWvRCtKUugkmVLFCtWbN765LLm2_9d-RYE&s=10https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQqGMBDqKfk7q0JEuVEWPQjPuWvRCtKUugkmVLFCtWbN765LLm2_9d-RYE&s=10",
+    desc: "Наран одын шимтэн үзэх хамгийн дуртай кино. Амьдралын үнэ цэнэ, нөхөрлөл болон зөв буруугийн ялгааг сургасан гайхалтай кинематик бүтээл."
+  },
+  { 
+    title: "One Piece: Red", 
+    rating: "9.5", 
+    genre: "Аниме", 
+    image: "https://upload.wikimedia.org/wikipedia/en/thumb/4/44/One_Piece_Film_Red_Visual_Poster.jpg/250px-One_Piece_Film_Red_Visual_Poster.",
+    desc: "Далайн дээрэмчдийн хаан болох хүсэлтэй Луффи болон Ута нарын гайхалтай дуу хөгжим, адал явдлаар дүүрэн аниме кино."
+  },
+  { 
+    title: "Demon Slayer Movie", 
+    rating: "9.7", 
+    genre: "Тулаант", 
+    image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=800&auto=format&fit=crop&q=80",
+    desc: "Танжиро болон Хашира нарын үлэмж хүчтэй харгис демончуудтай хийх ширүүн тулаан, гайхалтай дүрслэл бүхий кино."
+  },
+  { 
+    title: "Interstellar", 
+    rating: "9.6", 
+    genre: "Sci-Fi", 
+    image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80",
+    desc: "Сансар огторгуй, хар нүх болон цаг хугацааны гайхамшгийг харуулсан Кристофер Ноланы шилдэг кино."
+  }
+];
 
 interface SlideData {
   category: string;
@@ -265,6 +296,432 @@ const shuffleArray = <T,>(array: T[]): T[] => {
   return arr;
 };
 
+// Football Game Component (vs AI)
+function FootballGame({ teamSize, onBack }: { teamSize: 1 | 2; onBack: () => void }) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [scoreUser, setScoreUser] = useState(0);
+  const [scoreAi, setScoreAi] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(60);
+  const [gameOver, setGameOver] = useState(false);
+  const [goalBanner, setGoalBanner] = useState("");
+  const [scoreSaved, setScoreSaved] = useState(false);
+
+  useEffect(() => {
+    if (gameOver && !scoreSaved) {
+      setScoreSaved(true);
+      saveFootballScoreToFirestore("Наран Од", scoreUser, scoreAi, teamSize).catch(console.error);
+    }
+  }, [gameOver, scoreSaved, scoreUser, scoreAi, teamSize]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animationFrameId: number;
+    let timerInterval: any;
+
+    const ball = { x: 300, y: 175, vx: 0, vy: 0, radius: 8 };
+    const userPlayers = teamSize === 1 ? [{ x: 150, y: 175 }] : [{ x: 150, y: 120 }, { x: 150, y: 230 }];
+    const aiPlayers = teamSize === 1 ? [{ x: 450, y: 175 }] : [{ x: 450, y: 120 }, { x: 450, y: 230 }];
+    const referee = { x: 300, y: 220, vx: 1.2, vy: 0.8 };
+
+    const keys: { [key: string]: boolean } = {};
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      keys[e.key] = true;
+    };
+    const handleKeyUp = (e: KeyboardEvent) => {
+      keys[e.key] = false;
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    timerInterval = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          setGameOver(true);
+          clearInterval(timerInterval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    const resetPositions = () => {
+      ball.x = 300;
+      ball.y = 175;
+      ball.vx = 0;
+      ball.vy = 0;
+      userPlayers[0].x = 150; userPlayers[0].y = 175;
+      if (userPlayers[1]) { userPlayers[1].x = 150; userPlayers[1].y = 120; }
+      aiPlayers[0].x = 450; aiPlayers[0].y = 175;
+      if (aiPlayers[1]) { aiPlayers[1].x = 450; aiPlayers[1].y = 230; }
+      referee.x = 300; referee.y = 220;
+    };
+
+    let localScoreUser = 0;
+    let localScoreAi = 0;
+
+    const update = () => {
+      const p1 = userPlayers[0];
+      const speed = 3.8;
+      if (keys['ArrowUp'] || keys['w'] || keys['W']) p1.y -= speed;
+      if (keys['ArrowDown'] || keys['s'] || keys['S']) p1.y += speed;
+      if (keys['ArrowLeft'] || keys['a'] || keys['A']) p1.x -= speed;
+      if (keys['ArrowRight'] || keys['d'] || keys['D']) p1.x += speed;
+
+      p1.x = Math.max(25, Math.min(285, p1.x));
+      p1.y = Math.max(30, Math.min(320, p1.y));
+
+      if (userPlayers[1]) {
+        const p2 = userPlayers[1];
+        if (keys['ArrowUp'] || keys['w'] || keys['W']) p2.y -= speed;
+        if (keys['ArrowDown'] || keys['s'] || keys['S']) p2.y += speed;
+        if (keys['ArrowLeft'] || keys['a'] || keys['A']) p2.x -= speed;
+        if (keys['ArrowRight'] || keys['d'] || keys['D']) p2.x += speed;
+        p2.x = Math.max(25, Math.min(285, p2.x));
+        p2.y = Math.max(30, Math.min(320, p2.y));
+      }
+
+      // AI movement
+      aiPlayers.forEach((ai, idx) => {
+        const targetY = ball.y + (idx === 0 ? 0 : (idx === 1 ? -40 : 40));
+        const targetX = Math.max(315, Math.min(575, ball.x));
+        if (ai.x < targetX) ai.x += 2.5;
+        if (ai.x > targetX) ai.x -= 2.5;
+        if (ai.y < targetY) ai.y += 2.5;
+        if (ai.y > targetY) ai.y -= 2.5;
+      });
+
+      // Referee patrolling movement
+      referee.x += referee.vx;
+      referee.y += referee.vy;
+      if (referee.x < 100 || referee.x > 500) referee.vx *= -1;
+      if (referee.y < 50 || referee.y > 300) referee.vy *= -1;
+
+      ball.x += ball.vx;
+      ball.y += ball.vy;
+      ball.vx *= 0.98;
+      ball.vy *= 0.98;
+
+      if (ball.y < 28 || ball.y > 322) {
+        ball.vy *= -1;
+        ball.y = Math.max(28, Math.min(322, ball.y));
+      }
+
+      if (ball.x <= 20) {
+        if (ball.y >= 125 && ball.y <= 225) {
+          localScoreAi += 1;
+          setScoreAi(localScoreAi);
+          setGoalBanner("🤖 AI ГООЛ ХИЙЛЭЭ! ⚽");
+          setTimeout(() => setGoalBanner(""), 2000);
+          resetPositions();
+        } else {
+          ball.vx *= -1;
+          ball.x = 20;
+        }
+      }
+      if (ball.x >= 580) {
+        if (ball.y >= 125 && ball.y <= 225) {
+          localScoreUser += 1;
+          setScoreUser(localScoreUser);
+          setGoalBanner("🎉 ТА ГООЛ ХИЙЛЭЭ! ⚽🔥");
+          setTimeout(() => setGoalBanner(""), 2000);
+          resetPositions();
+        } else {
+          ball.vx *= -1;
+          ball.x = 580;
+        }
+      }
+
+      [...userPlayers, ...aiPlayers].forEach(p => {
+        const dx = ball.x - p.x;
+        const dy = ball.y - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 24) {
+          const angle = Math.atan2(dy, dx);
+          const kickPower = keys[' '] ? 8.0 : 4.8;
+          ball.vx = Math.cos(angle) * kickPower;
+          ball.vy = Math.sin(angle) * kickPower;
+        }
+      });
+    };
+
+    const draw = () => {
+      ctx.clearRect(0, 0, 600, 350);
+
+      // Pitch background (Green grass stripes)
+      ctx.fillStyle = '#15803d';
+      ctx.fillRect(0, 0, 600, 350);
+
+      for (let x = 0; x < 600; x += 40) {
+        ctx.fillStyle = (x / 40) % 2 === 0 ? 'rgba(255, 255, 255, 0.04)' : 'transparent';
+        ctx.fillRect(x, 24, 40, 302);
+      }
+
+      // Stadium Stands & Cheerleaders / Spectators (Top & Bottom)
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, 600, 24);
+      ctx.fillRect(0, 326, 600, 24);
+
+      // Crowd dots / cheering flags
+      for (let i = 15; i < 590; i += 20) {
+        const colors = ['#f43f5e', '#3b82f6', '#eab308', '#a855f7', '#10b981'];
+        ctx.fillStyle = colors[(i / 20) % colors.length];
+        ctx.beginPath();
+        ctx.arc(i, 12, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(i + 8, 338, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 9px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('🏟️ ANIME STADIUM - ҮЗЭГЧИД & ХӨГЖӨӨН ДЭМЖИГЧИД', 16, 16);
+
+      // Pitch lines
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.lineWidth = 2.5;
+      ctx.strokeRect(20, 28, 560, 294);
+
+      ctx.beginPath();
+      ctx.moveTo(300, 28);
+      ctx.lineTo(300, 322);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(300, 175, 55, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(300, 175, 3, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+
+      // Goal boxes
+      ctx.strokeRect(20, 115, 55, 120);
+      ctx.strokeRect(525, 115, 55, 120);
+
+      // Goal nets
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+      ctx.fillRect(8, 135, 12, 80);
+      ctx.fillRect(580, 135, 12, 80);
+
+      // Scoreboard Banner on Canvas
+      ctx.fillStyle = '#09090b';
+      ctx.strokeStyle = '#eab308';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(205, 32, 190, 26, 6);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#eab308';
+      ctx.font = 'bold 11px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(`🔴 ${scoreUser}  VS  ${scoreAi} 🔵 | ⏱️ ${timeLeft}s`, 300, 48);
+
+      // Ball
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Human-like Player helper
+      const drawHumanPlayer = (px: number, py: number, kitColor: string, label: string, isUser: boolean) => {
+        // Shadow
+        ctx.beginPath();
+        ctx.arc(px, py + 4, 11, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,0,0,0.35)';
+        ctx.fill();
+
+        // Cleats
+        ctx.fillStyle = '#111827';
+        ctx.fillRect(px - 6, py + 6, 4, 4);
+        ctx.fillRect(px + 2, py + 6, 4, 4);
+
+        // Shorts
+        ctx.fillStyle = isUser ? '#1e3a8a' : '#1f2937';
+        ctx.fillRect(px - 7, py, 14, 8);
+
+        // Jersey / Body
+        ctx.beginPath();
+        ctx.arc(px, py - 2, 12, 0, Math.PI * 2);
+        ctx.fillStyle = kitColor;
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#ffffff';
+        ctx.stroke();
+
+        // Head
+        ctx.beginPath();
+        ctx.arc(px, py - 13, 7, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffedd5';
+        ctx.fill();
+        ctx.strokeStyle = '#292524';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Hair
+        ctx.fillStyle = isUser ? '#b91c1c' : '#2563eb';
+        ctx.beginPath();
+        ctx.arc(px, py - 15, 6, Math.PI, Math.PI * 2);
+        ctx.fill();
+
+        // Number / Label
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 9px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(label, px, py + 2);
+      };
+
+      // Referee helper
+      const drawReferee = (rx: number, ry: number) => {
+        // Shadow
+        ctx.beginPath();
+        ctx.arc(rx, ry + 4, 10, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.fill();
+
+        // Shorts
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(rx - 6, ry, 12, 7);
+
+        // Yellow Jersey
+        ctx.beginPath();
+        ctx.arc(rx, ry - 2, 11, 0, Math.PI * 2);
+        ctx.fillStyle = '#eab308';
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#000000';
+        ctx.stroke();
+
+        // Head & Whistle
+        ctx.beginPath();
+        ctx.arc(rx, ry - 12, 6, 0, Math.PI * 2);
+        ctx.fillStyle = '#fed7aa';
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(rx - 2, ry - 8, 4, 3);
+
+        ctx.fillStyle = '#000000';
+        ctx.font = 'bold 8px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('REF', rx, ry + 2);
+      };
+
+      // Draw User Players
+      userPlayers.forEach((p, i) => {
+        drawHumanPlayer(p.x, p.y, '#ef4444', `P${i+1}`, true);
+      });
+
+      // Draw AI Players
+      aiPlayers.forEach((p, i) => {
+        drawHumanPlayer(p.x, p.y, '#3b82f6', `AI${i+1}`, false);
+      });
+
+      // Draw Referee
+      drawReferee(referee.x, referee.y);
+    };
+
+    const loop = () => {
+      update();
+      draw();
+      animationFrameId = requestAnimationFrame(loop);
+    };
+
+    animationFrameId = requestAnimationFrame(loop);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      clearInterval(timerInterval);
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [teamSize]);
+
+  return (
+    <div className="relative w-full max-w-2xl bg-gray-950/95 border border-white/10 rounded-3xl overflow-hidden shadow-2xl p-6 flex flex-col backdrop-blur-xl">
+      {goalBanner && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 bg-gradient-to-r from-red-600 to-amber-500 text-white px-6 py-2 rounded-full font-black text-sm shadow-2xl animate-bounce">
+          {goalBanner}
+        </div>
+      )}
+
+      <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+        <div className="flex items-center gap-3">
+          <span className="bg-red-600/30 text-red-400 font-bold px-3 py-1 rounded-xl text-xs border border-red-500/30">
+            🔴 Танай баг
+          </span>
+          <span className="text-2xl font-black text-white">{scoreUser}</span>
+        </div>
+
+        <div className="flex flex-col items-center">
+          <span className="text-xs text-gray-400 uppercase font-bold tracking-wider">Цаг</span>
+          <span className={`text-lg font-mono font-bold ${timeLeft <= 10 ? 'text-red-500 animate-pulse' : 'text-amber-400'}`}>
+            0:{timeLeft < 10 ? `0${timeLeft}` : timeLeft}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <span className="text-2xl font-black text-white">{scoreAi}</span>
+          <span className="bg-blue-600/30 text-blue-400 font-bold px-3 py-1 rounded-xl text-xs border border-blue-500/30">
+            🔵 AI Баг
+          </span>
+        </div>
+      </div>
+
+      {gameOver ? (
+        <div className="flex flex-col items-center text-center py-8 animate-blur-fade-up">
+          <span className="text-5xl mb-3">🏆</span>
+          <h2 className="text-3xl font-black text-white mb-2">Тоглолт өндөрлөөрөө!</h2>
+          <p className="text-gray-400 text-sm mb-4">
+            {scoreUser > scoreAi ? "🎉 БАЯР ХҮРГЭЕ! Та яллаа!" : scoreUser < scoreAi ? "😢 AI яллаа! Дахин оролцоно уу." : "🤝 Тэнцлээ!"}
+          </p>
+          <div className="bg-emerald-600/10 border border-emerald-500/30 text-emerald-400 px-4 py-1.5 rounded-full text-xs font-semibold mb-6 flex items-center gap-1.5 animate-pulse">
+            <span>💾 Оноо Firestore "football_scores" collection-д хадгалагдлаа!</span>
+          </div>
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-4 w-full max-w-sm mb-6 flex justify-around text-lg font-bold">
+            <div>Та: <span className="text-red-500">{scoreUser}</span></div>
+            <div>AI: <span className="text-blue-500">{scoreAi}</span></div>
+          </div>
+          <button
+            onClick={onBack}
+            className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full transition-all cursor-pointer shadow-lg shadow-red-600/30"
+          >
+            Цэс рүү буцах ➔
+          </button>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center">
+          <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-inner bg-green-900 mb-4">
+            <canvas ref={canvasRef} width={600} height={350} className="w-full h-auto block" />
+          </div>
+
+          <div className="flex items-center justify-between w-full text-xs text-gray-400 px-2">
+            <span>⌨️ Удирдах: WASD / Сумтай товчлуурууд + Space (Цохих)</span>
+            <button
+              onClick={onBack}
+              className="text-red-400 hover:underline font-semibold cursor-pointer"
+            >
+              Тоглоом болих ✕
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function App() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -272,11 +729,13 @@ export default function App() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [selectedMoviePopup, setSelectedMoviePopup] = useState<any | null>(null);
 
   // Game state
   const [isGameOpen, setIsGameOpen] = useState(false);
   const [questionsRaw, setQuestionsRaw] = useState<any[]>(fallbackQuestions);
-  const [selectedCategory, setSelectedCategory] = useState<'emoji' | 'character' | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<'emoji' | 'character' | 'football' | null>(null);
+  const [fbTeamSize, setFbTeamSize] = useState<1 | 2>(1);
   const [questions, setQuestions] = useState<any[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -317,6 +776,8 @@ export default function App() {
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
   const [isSubmittingScore, setIsSubmittingScore] = useState(false);
   const [leaderboardCategoryFilter, setLeaderboardCategoryFilter] = useState<'all' | 'emoji' | 'character'>('all');
+  const [footballLeaderboard, setFootballLeaderboard] = useState<FootballScoreEntry[]>([]);
+  const [activeLeaderboardTab, setActiveLeaderboardTab] = useState<'anime' | 'football'>('anime');
 
   const submitScoreToLeaderboard = async () => {
     if (scoreSubmitted || isSubmittingScore) return;
@@ -398,6 +859,10 @@ export default function App() {
         if (topScores && topScores.length > 0) {
           setLeaderboard(topScores);
         }
+        const topFootballScores = await getTopFootballScoresFromFirestore();
+        if (topFootballScores && topFootballScores.length > 0) {
+          setFootballLeaderboard(topFootballScores);
+        }
       } catch (err) {
         console.error("Failed to load scores on mount:", err);
       } finally {
@@ -416,6 +881,10 @@ export default function App() {
           const topScores = await getTopScoresFromFirestore();
           if (topScores && topScores.length > 0) {
             setLeaderboard(topScores);
+          }
+          const topFootballScores = await getTopFootballScoresFromFirestore();
+          if (topFootballScores && topFootballScores.length > 0) {
+            setFootballLeaderboard(topFootballScores);
           }
         } catch (err) {
           console.error("Failed to load scores when opening leaderboard:", err);
@@ -670,76 +1139,93 @@ export default function App() {
           </div>
         </div>
 
-        {/* Center Desktop Links */}
-        <div className="hidden lg:flex items-center gap-8 xl:gap-10">
-          {slides.map((slide, idx) => {
-            const delays = ['100ms', '150ms', '200ms', '250ms', '300ms'];
-            const isActive = activeSlide === idx;
-            return (
-              <button
-                key={slide.category}
-                onClick={() => handleNavClick(idx)}
-                className={`text-sm font-medium tracking-wide transition-all duration-300 animate-blur-fade-up relative py-1 ${
-                  isActive ? 'text-white font-semibold' : 'text-gray-400 hover:text-gray-200'
-                }`}
-                style={{ animationDelay: delays[idx] || '200ms' }}
-              >
-                <span className="flex items-center">
-                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-red-500 mr-2 animate-pulse" />}
-                  {slide.navTitle}
-                </span>
-                {isActive && (
-                  <span className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-red-600 to-transparent rounded-full" />
-                )}
-              </button>
-            );
-          })}
+        {/* Center Desktop Links (Two Rows) */}
+        <div className="hidden lg:flex flex-col items-center gap-1.5">
+          {/* Row 1: First 4 items */}
+          <div className="flex items-center gap-6 xl:gap-8">
+            {slides.slice(0, 4).map((slide, idx) => {
+              const isActive = activeSlide === idx;
+              return (
+                <button
+                  key={slide.category}
+                  onClick={() => handleNavClick(idx)}
+                  className={`text-sm font-medium tracking-wide transition-all duration-300 relative py-0.5 ${
+                    isActive ? 'text-white font-semibold' : 'text-gray-400 hover:text-gray-200'
+                  }`}
+                >
+                  <span className="flex items-center">
+                    {isActive && <span className="w-1.5 h-1.5 rounded-full bg-red-500 mr-2 animate-pulse" />}
+                    {slide.navTitle}
+                  </span>
+                  {isActive && (
+                    <span className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-red-600 to-transparent rounded-full" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
 
-          {/* Typeracer link tab */}
-          <a
-            href="https://narantsogt-naran-od.vercel.app/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm font-medium tracking-wide transition-all duration-300 animate-blur-fade-up relative py-1 text-gray-400 hover:text-gray-200 flex items-center gap-1.5 cursor-pointer"
-            style={{ animationDelay: '350ms' }}
-          >
-            <span>⌨️ Typeracer</span>
-          </a>
+          {/* Row 2: Last 2 items + Typeracer link */}
+          <div className="flex items-center gap-6 xl:gap-8">
+            {slides.slice(4).map((slide, i) => {
+              const idx = i + 4;
+              const isActive = activeSlide === idx;
+              return (
+                <button
+                  key={slide.category}
+                  onClick={() => handleNavClick(idx)}
+                  className={`text-sm font-medium tracking-wide transition-all duration-300 relative py-0.5 ${
+                    isActive ? 'text-white font-semibold' : 'text-gray-400 hover:text-gray-200'
+                  }`}
+                >
+                  <span className="flex items-center">
+                    {isActive && <span className="w-1.5 h-1.5 rounded-full bg-red-500 mr-2 animate-pulse" />}
+                    {slide.navTitle}
+                  </span>
+                  {isActive && (
+                    <span className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-red-600 to-transparent rounded-full" />
+                  )}
+                </button>
+              );
+            })}
+
+            {/* Typeracer link tab */}
+            <a
+              href="https://narantsogt-naran-od.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium tracking-wide transition-all duration-300 relative py-0.5 text-gray-400 hover:text-gray-200 flex items-center gap-1.5 cursor-pointer"
+            >
+              <span>⌨️ Typeracer</span>
+            </a>
+          </div>
         </div>
 
         {/* Right Buttons */}
-        <div className="flex items-center gap-3">
-          {/* Leaderboard Button (sm and up) */}
-          <button
-            onClick={() => setIsLeaderboardOpen(true)}
-            className="hidden sm:flex items-center gap-2 rounded-full liquid-glass px-4 md:px-6 py-2 text-sm font-medium text-white hover:text-gray-200 hover:scale-105 transition-all animate-blur-fade-up active:scale-95 cursor-pointer"
-            style={{ animationDelay: '320ms' }}
-          >
-            <Trophy size={18} className="text-amber-400" />
-            <span>Leaderboard</span>
-          </button>
+        <div className="flex items-center gap-2 sm:gap-3">
+
 
           {/* Search Button (sm and up) */}
           <button
             onClick={() => setIsSearchOpen(true)}
-            className="hidden sm:flex items-center gap-2 rounded-full liquid-glass px-4 md:px-6 py-2 text-sm font-medium text-white hover:text-gray-200 hover:scale-105 transition-all animate-blur-fade-up active:scale-95"
+            className="hidden sm:flex items-center gap-2 rounded-full liquid-glass px-3.5 md:px-5 py-2 text-sm font-medium text-white hover:text-gray-200 hover:scale-105 transition-all animate-blur-fade-up active:scale-95 cursor-pointer"
             style={{ animationDelay: '350ms' }}
           >
-            <Search size={18} className="text-gray-300" />
-            <span>Search</span>
+            <Search size={16} className="text-gray-300" />
+            <span className="hidden md:inline">Search</span>
           </button>
 
           {/* User / Profile Button (sm and up) */}
           <button
             onClick={() => setIsProfileOpen(true)}
-            className="hidden sm:flex items-center gap-3 rounded-full liquid-glass px-4 py-2 text-white hover:scale-105 transition-all animate-blur-fade-up active:scale-95 group cursor-pointer"
+            className="hidden sm:flex items-center gap-2.5 rounded-full liquid-glass px-3.5 py-1.5 text-white hover:scale-105 transition-all animate-blur-fade-up active:scale-95 group cursor-pointer"
             style={{ animationDelay: '400ms' }}
             title="Миний профайл"
           >
-            <div className="w-8 h-8 rounded-full bg-red-600/30 flex items-center justify-center text-red-400 group-hover:bg-red-600/50 transition-colors">
-              <User size={16} />
+            <div className="w-7 h-7 rounded-full bg-red-600/30 flex items-center justify-center text-red-400 group-hover:bg-red-600/50 transition-colors">
+              <User size={14} />
             </div>
-            <div className="text-left">
+            <div className="text-left hidden md:block">
               <div className="text-xs font-bold leading-tight text-white">Наран Од</div>
               <div className="text-[10px] text-gray-400 leading-tight">10 настай</div>
             </div>
@@ -839,16 +1325,7 @@ export default function App() {
               <Search size={16} className="text-gray-300" />
               <span>Хайх</span>
             </button>
-            <button
-              onClick={() => {
-                setIsMobileMenuOpen(false);
-                setIsLeaderboardOpen(true);
-              }}
-              className="flex flex-col items-center justify-center gap-1 rounded-xl bg-gray-800/80 py-2 px-1 text-xs font-medium text-white"
-            >
-              <Trophy size={16} className="text-amber-400" />
-              <span>Оноо</span>
-            </button>
+
             <button
               onClick={() => {
                 setIsMobileMenuOpen(false);
@@ -870,7 +1347,7 @@ export default function App() {
           <div key={`hero-left-${activeSlide}`} className="flex-1 w-full max-w-3xl">
             {activeSlide === 1 ? (
               /* DIRECT EMBEDDED GAME INTERFACE FOR "МИНИЙ ТОГЛООМУУД" */
-              <div className="relative w-full max-w-2xl bg-gray-950/90 border border-white/10 rounded-3xl overflow-hidden shadow-2xl p-6 md:p-8 flex flex-col backdrop-blur-xl">
+              <div className="relative w-full max-w-5xl bg-gray-950/90 border border-white/10 rounded-3xl overflow-hidden shadow-2xl p-6 md:p-8 flex flex-col backdrop-blur-xl">
                 {/* STREAK BONUS ANIMATED BANNER */}
                 {showBonus && (
                   <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20 bg-gradient-to-r from-amber-500 to-red-600 text-white px-6 py-2 rounded-full font-black tracking-widest text-sm shadow-2xl shadow-red-500/50 flex items-center gap-2 animate-bounce">
@@ -879,56 +1356,234 @@ export default function App() {
                 )}
 
                 {/* GAME SELECTION / STATE ROUTING */}
-                {selectedCategory === null ? (
-                  /* CATEGORY SELECTOR MENU */
-                  <div className="flex flex-col items-center text-center py-6 animate-blur-fade-up">
-                    <div className="w-16 h-16 rounded-full bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-500 mb-4 relative">
-                      <div className="absolute inset-0 rounded-full bg-red-600/30 blur-lg" />
-                      <Play size={32} className="fill-red-500 ml-1 relative z-10" />
-                    </div>
-                    <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">Миний тоглоомууд</h2>
-                    <p className="text-gray-400 text-sm max-w-sm mb-8 font-medium">Таах горимоо сонгон аниме мэдлэгээ сориорой!</p>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-lg mb-8">
-                      {/* Category: Emoji */}
-                      <button
-                        onClick={() => {
-                          const filtered = questionsRaw.filter(q => q.category === 'emoji');
-                          const processed = filtered.map((q: any) => ({
-                            ...q,
-                            options: shuffleArray(q.options || [])
-                          }));
-                          setQuestions(shuffleArray(processed));
-                          setCurrentQuestionIndex(0);
-                          setSelectedCategory('emoji');
-                          setTimeLeft(playMode === 'type' ? 20 : 15);
-                        }}
-                        className="flex flex-col items-center justify-center p-6 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-red-500/50 hover:scale-[1.02] transition-all duration-300 group cursor-pointer"
-                      >
-                        <span className="text-4xl mb-3 group-hover:scale-110 transition-transform">🎬</span>
-                        <h3 className="font-bold text-white text-base">Аниме Таах (Эможи)</h3>
-                        <p className="text-xs text-gray-500 mt-1 font-medium">Эможи хараад анимэг таана</p>
-                      </button>
+                {selectedCategory === 'football' ? (
+                  <FootballGame teamSize={fbTeamSize} onBack={() => setSelectedCategory(null)} />
+                ) : selectedCategory === null ? (
+                  /* CATEGORY SELECTOR MENU + PROMINENT LEADERBOARD SIDE-BY-SIDE */
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 py-2 animate-blur-fade-up w-full">
+                    {/* Left: Games Menu */}
+                    <div className="flex flex-col items-center text-center justify-center">
+                      <div className="w-14 h-14 rounded-full bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-500 mb-3 relative">
+                        <div className="absolute inset-0 rounded-full bg-red-600/30 blur-lg" />
+                        <Play size={28} className="fill-red-500 ml-1 relative z-10" />
+                      </div>
+                      <h2 className="text-xl sm:text-2xl font-black text-white mb-1">Миний тоглоомууд</h2>
+                      <p className="text-gray-400 text-xs mb-4 font-medium">Тоглох төрлөө сонгоно уу!</p>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full mb-4">
+                        {/* Category: Emoji */}
+                        <button
+                          onClick={() => {
+                            const filtered = questionsRaw.filter(q => q.category === 'emoji');
+                            const processed = filtered.map((q: any) => ({
+                              ...q,
+                              options: shuffleArray(q.options || [])
+                            }));
+                            setQuestions(shuffleArray(processed));
+                            setCurrentQuestionIndex(0);
+                            setSelectedCategory('emoji');
+                            setTimeLeft(playMode === 'type' ? 20 : 15);
+                          }}
+                          className="flex flex-col items-center justify-center p-4 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-red-500/50 hover:scale-[1.02] transition-all duration-300 group cursor-pointer"
+                        >
+                          <span className="text-2xl mb-1.5 group-hover:scale-110 transition-transform">🎬</span>
+                          <h3 className="font-bold text-white text-xs">Аниме Таах (Эможи)</h3>
+                          <p className="text-[10px] text-gray-500 mt-0.5">Эможи хараад таана</p>
+                        </button>
 
-                      {/* Category: Character */}
-                      <button
-                        onClick={() => {
-                          const filtered = questionsRaw.filter(q => q.category === 'character');
-                          const processed = filtered.map((q: any) => ({
-                            ...q,
-                            options: shuffleArray(q.options || [])
-                          }));
-                          setQuestions(shuffleArray(processed));
-                          setCurrentQuestionIndex(0);
-                          setSelectedCategory('character');
-                          setTimeLeft(playMode === 'type' ? 20 : 15);
-                        }}
-                        className="flex flex-col items-center justify-center p-6 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-red-500/50 hover:scale-[1.02] transition-all duration-300 group cursor-pointer"
-                      >
-                        <span className="text-4xl mb-3 group-hover:scale-110 transition-transform">🏆</span>
-                        <h3 className="font-bold text-white text-base">Баатрын дүр таах</h3>
-                        <p className="text-xs text-gray-500 mt-1 font-medium">Luffy, Naruto, Tanjiro, Goku-г таана</p>
-                      </button>
+                        {/* Category: Character */}
+                        <button
+                          onClick={() => {
+                            const filtered = questionsRaw.filter(q => q.category === 'character');
+                            const processed = filtered.map((q: any) => ({
+                              ...q,
+                              options: shuffleArray(q.options || [])
+                            }));
+                            setQuestions(shuffleArray(processed));
+                            setCurrentQuestionIndex(0);
+                            setSelectedCategory('character');
+                            setTimeLeft(playMode === 'type' ? 20 : 15);
+                          }}
+                          className="flex flex-col items-center justify-center p-4 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-red-500/50 hover:scale-[1.02] transition-all duration-300 group cursor-pointer"
+                        >
+                          <span className="text-2xl mb-1.5 group-hover:scale-110 transition-transform">🏆</span>
+                          <h3 className="font-bold text-white text-xs">Баатрын дүр таах</h3>
+                          <p className="text-[10px] text-gray-500 mt-0.5">Luffy, Naruto, Goku</p>
+                        </button>
+                      </div>
+
+                      {/* Category: Football Game vs AI */}
+                      <div className="w-full p-4 rounded-2xl border border-white/10 bg-white/5 flex flex-col items-center">
+                        <span className="text-2xl mb-1.5">⚽</span>
+                        <h3 className="font-bold text-white text-xs mb-0.5">Хөлбөмбөг (vs AI)</h3>
+                        <p className="text-[10px] text-gray-400 mb-2">Тоглогчийн тоог сонгоно уу</p>
+                        <div className="flex items-center gap-2 mb-3">
+                          <button
+                            onClick={() => setFbTeamSize(1)}
+                            className={`px-3 py-1 rounded-xl font-bold text-[11px] transition-all cursor-pointer ${
+                              fbTeamSize === 1 ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                            }`}
+                          >
+                            1 vs 1
+                          </button>
+                          <button
+                            onClick={() => setFbTeamSize(2)}
+                            className={`px-3 py-1 rounded-xl font-bold text-[11px] transition-all cursor-pointer ${
+                              fbTeamSize === 2 ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                            }`}
+                          >
+                            2 vs 2
+                          </button>
+                        </div>
+                        <button
+                          onClick={() => setSelectedCategory('football')}
+                          className="bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-2 rounded-full text-xs transition-all shadow-lg shadow-red-600/30 cursor-pointer"
+                        >
+                          Хөлбөмбөг эхлүүлэх ⚽
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Right: Prominent Leaderboard */}
+                    <div className="flex flex-col bg-white/5 border border-white/10 rounded-2xl p-4 max-h-[460px] overflow-hidden">
+                      <div className="flex items-center justify-between mb-3 pb-2 border-b border-white/10">
+                        <div className="flex items-center gap-2">
+                          <Trophy size={18} className="text-amber-400" />
+                          <h3 className="font-extrabold text-white text-sm">Топ 10 Шилдэг Жагсаалт</h3>
+                        </div>
+                        <div className="flex bg-white/5 p-0.5 rounded-xl border border-white/10 text-[10px]">
+                          <button
+                            onClick={() => setActiveLeaderboardTab('anime')}
+                            className={`px-2.5 py-1 font-bold rounded-lg transition-all cursor-pointer ${
+                              activeLeaderboardTab === 'anime' ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white'
+                            }`}
+                          >
+                            🎌 Аниме
+                          </button>
+                          <button
+                            onClick={() => setActiveLeaderboardTab('football')}
+                            className={`px-2.5 py-1 font-bold rounded-lg transition-all cursor-pointer ${
+                              activeLeaderboardTab === 'football' ? 'bg-green-600 text-white' : 'text-gray-400 hover:text-white'
+                            }`}
+                          >
+                            ⚽ Хөлбөмбөг
+                          </button>
+                        </div>
+                      </div>
+
+                      {activeLeaderboardTab === 'anime' ? (
+                        <>
+                          <div className="flex bg-white/5 p-0.5 rounded-xl mb-3 border border-white/5 text-[10px]">
+                            <button
+                              onClick={() => setLeaderboardCategoryFilter('all')}
+                              className={`flex-1 py-1 font-bold rounded-lg transition-all cursor-pointer ${
+                                leaderboardCategoryFilter === 'all' ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white'
+                              }`}
+                            >
+                              Бүгд
+                            </button>
+                            <button
+                              onClick={() => setLeaderboardCategoryFilter('emoji')}
+                              className={`flex-1 py-1 font-bold rounded-lg transition-all cursor-pointer ${
+                                leaderboardCategoryFilter === 'emoji' ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white'
+                              }`}
+                            >
+                              Эможи
+                            </button>
+                            <button
+                              onClick={() => setLeaderboardCategoryFilter('character')}
+                              className={`flex-1 py-1 font-bold rounded-lg transition-all cursor-pointer ${
+                                leaderboardCategoryFilter === 'character' ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white'
+                              }`}
+                            >
+                              Дүр
+                            </button>
+                          </div>
+
+                          <div className="flex-1 overflow-y-auto pr-1 space-y-1.5">
+                            {leaderboard.filter(entry => leaderboardCategoryFilter === 'all' || entry.category === leaderboardCategoryFilter).length === 0 ? (
+                              <div className="text-center py-6 text-gray-500 text-xs">Одоогоор оноо байхгүй байна. 🚀</div>
+                            ) : (
+                              leaderboard
+                                .filter(entry => leaderboardCategoryFilter === 'all' || entry.category === leaderboardCategoryFilter)
+                                .slice(0, 10)
+                                .map((entry, idx) => {
+                                  const isTop3 = idx < 3;
+                                  const medalColors = ['from-yellow-400 to-amber-500 text-black', 'from-slate-300 to-slate-400 text-black', 'from-amber-600 to-amber-800 text-white'];
+                                  return (
+                                    <div
+                                      key={entry.id}
+                                      className="flex items-center justify-between p-2.5 rounded-xl border bg-white/5 border-white/5 text-xs"
+                                    >
+                                      <div className="flex items-center gap-2 min-w-0">
+                                        {isTop3 ? (
+                                          <div className={`w-5 h-5 rounded-full bg-gradient-to-br ${medalColors[idx]} font-black text-[10px] flex items-center justify-center shrink-0`}>
+                                            {idx + 1}
+                                          </div>
+                                        ) : (
+                                          <div className="w-5 h-5 font-bold text-[10px] text-gray-500 flex items-center justify-center shrink-0">
+                                            {idx + 1}
+                                          </div>
+                                        )}
+                                        <span className="font-bold text-white truncate text-xs">
+                                          {entry.name}
+                                        </span>
+                                      </div>
+                                      <div className="flex items-center gap-1.5 shrink-0">
+                                        <span className="text-[9px] bg-red-500/10 px-1 py-0.5 rounded text-red-400">
+                                          {entry.category === 'character' ? 'Дүр' : 'Эможи'}
+                                        </span>
+                                        <span className="font-mono text-xs font-black text-amber-400">
+                                          {entry.score}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  );
+                                })
+                            )}
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex-1 overflow-y-auto pr-1 space-y-1.5">
+                          {footballLeaderboard.length === 0 ? (
+                            <div className="text-center py-6 text-gray-500 text-xs">Хөлбөмбөгийн оноо одоогоор алга. ⚽</div>
+                          ) : (
+                            footballLeaderboard.slice(0, 10).map((entry, idx) => {
+                              const isTop3 = idx < 3;
+                              const medalColors = ['from-yellow-400 to-amber-500 text-black', 'from-slate-300 to-slate-400 text-black', 'from-amber-600 to-amber-800 text-white'];
+                              return (
+                                <div
+                                  key={entry.id}
+                                  className="flex items-center justify-between p-2.5 rounded-xl border bg-white/5 border-white/5 text-xs"
+                                >
+                                  <div className="flex items-center gap-2 min-w-0">
+                                    {isTop3 ? (
+                                      <div className={`w-5 h-5 rounded-full bg-gradient-to-br ${medalColors[idx]} font-black text-[10px] flex items-center justify-center shrink-0`}>
+                                        {idx + 1}
+                                      </div>
+                                    ) : (
+                                      <div className="w-5 h-5 font-bold text-[10px] text-gray-500 flex items-center justify-center shrink-0">
+                                        {idx + 1}
+                                      </div>
+                                    )}
+                                    <span className="font-bold text-white truncate text-xs">
+                                      {entry.name}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-2 shrink-0 text-[11px]">
+                                    <span className="text-[9px] bg-green-500/10 px-1 py-0.5 rounded text-green-400">
+                                      {entry.teamSize}v{entry.teamSize}
+                                    </span>
+                                    <span className="font-mono text-amber-400 font-bold">
+                                      {entry.score}-{entry.aiScore}
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            })
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ) : lives <= 0 ? (
@@ -1359,17 +2014,6 @@ export default function App() {
                 {/* CTA Buttons */}
                 <div className="flex flex-wrap items-center gap-3 sm:gap-4">
                   <button
-                    onClick={() => {
-                      setActiveSlide(1);
-                    }}
-                    className="flex items-center gap-2.5 bg-white text-black rounded-full font-medium px-6 sm:px-8 py-2.5 sm:py-3 hover:bg-gray-200 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-white/10 animate-blur-fade-up cursor-pointer"
-                    style={{ animationDelay: '600ms' }}
-                  >
-                    <Play size={18} className="fill-black text-black" />
-                    <span>Play Now</span>
-                  </button>
-
-                  <button
                     onClick={() => setIsProfileOpen(true)}
                     className="flex items-center gap-2 rounded-full font-medium liquid-glass px-6 sm:px-8 py-2.5 sm:py-3 text-white hover:text-gray-200 hover:scale-105 active:scale-95 transition-all animate-blur-fade-up cursor-pointer"
                     style={{ animationDelay: '700ms' }}
@@ -1382,27 +2026,56 @@ export default function App() {
             )}
           </div>
 
-          {/* Right Side - Navigation Arrows */}
-          <div className="flex items-center gap-3 md:w-auto self-end md:self-end">
-            <button
-              onClick={handlePrev}
-              className="flex items-center justify-center gap-2 rounded-full liquid-glass px-4 sm:px-6 py-2.5 sm:py-3 text-white hover:scale-105 active:scale-95 transition-all animate-blur-fade-up cursor-pointer group"
-              style={{ animationDelay: '800ms' }}
-              title="Өмнөх"
-            >
-              <ChevronLeft size={20} className="text-gray-300 group-hover:text-white group-hover:-translate-x-0.5 transition-all" />
-              <span className="text-xs sm:text-sm font-medium pr-1">Previous</span>
-            </button>
+          {/* Right Side - Navigation Arrows & Favorite Movies on Movies Tab */}
+          <div className="flex flex-col items-end gap-3 md:w-auto self-end md:self-end">
+            {activeSlide === 0 && (
+              <div className="bg-black/60 border border-white/10 rounded-2xl p-3.5 backdrop-blur-xl w-64 sm:w-72 animate-blur-fade-up shadow-2xl mb-1">
+                <div className="flex items-center gap-1.5 text-amber-400 font-extrabold text-xs mb-2.5 pb-1.5 border-b border-white/10">
+                  <Film size={14} className="text-amber-400" />
+                  <span>Наран одын дуртай кинонууд 🍿</span>
+                </div>
+                <div className="space-y-1.5">
+                  {favoriteMovies.map((movie, idx) => (
+                    <div
+                      key={idx}
+                      onClick={() => setSelectedMoviePopup(movie)}
+                      className="flex items-center justify-between text-[11px] bg-white/5 hover:bg-white/15 p-2 rounded-xl transition-all border border-white/5 cursor-pointer group"
+                    >
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="text-gray-500 font-bold">{idx + 1}.</span>
+                        <span className="font-bold text-white truncate max-w-[130px] group-hover:text-red-400 transition-colors">{movie.title}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <span className="text-[9px] text-gray-400 bg-white/10 px-1.5 py-0.5 rounded font-medium">{movie.genre}</span>
+                        <span className="text-amber-400 font-mono font-bold">★ {movie.rating}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
-            <button
-              onClick={handleNext}
-              className="flex items-center justify-center gap-2 rounded-full liquid-glass px-4 sm:px-6 py-2.5 sm:py-3 text-white hover:scale-105 active:scale-95 transition-all animate-blur-fade-up cursor-pointer group"
-              style={{ animationDelay: '900ms' }}
-              title="Дараах"
-            >
-              <span className="text-xs sm:text-sm font-medium pl-1">Next</span>
-              <ChevronRight size={20} className="text-gray-300 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handlePrev}
+                className="flex items-center justify-center gap-2 rounded-full liquid-glass px-4 sm:px-6 py-2.5 sm:py-3 text-white hover:scale-105 active:scale-95 transition-all animate-blur-fade-up cursor-pointer group"
+                style={{ animationDelay: '800ms' }}
+                title="Өмнөх"
+              >
+                <ChevronLeft size={20} className="text-gray-300 group-hover:text-white group-hover:-translate-x-0.5 transition-all" />
+                <span className="text-xs sm:text-sm font-medium pr-1">Previous</span>
+              </button>
+
+              <button
+                onClick={handleNext}
+                className="flex items-center justify-center gap-2 rounded-full liquid-glass px-4 sm:px-6 py-2.5 sm:py-3 text-white hover:scale-105 active:scale-95 transition-all animate-blur-fade-up cursor-pointer group"
+                style={{ animationDelay: '900ms' }}
+                title="Дараах"
+              >
+                <span className="text-xs sm:text-sm font-medium pl-1">Next</span>
+                <ChevronRight size={20} className="text-gray-300 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -2158,6 +2831,51 @@ export default function App() {
         </div>
       )}
 
+      {/* MOVIE IMAGE POPUP MODAL */}
+      {selectedMoviePopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-2xl animate-fade-in">
+          <div className="relative w-full max-w-lg bg-gray-900 border border-white/15 rounded-3xl overflow-hidden shadow-2xl p-6 text-center animate-blur-fade-up">
+            <button
+              onClick={() => setSelectedMoviePopup(null)}
+              className="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center transition-colors text-white z-10 cursor-pointer"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="relative w-full h-56 sm:h-64 rounded-2xl overflow-hidden mb-5 border border-white/10 shadow-lg">
+              <img
+                src={selectedMoviePopup.image}
+                alt={selectedMoviePopup.title}
+                className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-4">
+                <div className="flex items-center justify-between w-full">
+                  <span className="bg-red-600/90 text-white font-bold px-3 py-1 rounded-xl text-xs backdrop-blur-md">
+                    {selectedMoviePopup.genre}
+                  </span>
+                  <span className="text-amber-400 font-mono font-black text-sm bg-black/60 px-3 py-1 rounded-xl backdrop-blur-md">
+                    ★ {selectedMoviePopup.rating} IMDB
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <h3 className="text-2xl font-black text-white mb-2">{selectedMoviePopup.title}</h3>
+            <p className="text-gray-300 text-sm leading-relaxed mb-6 bg-white/5 border border-white/10 p-4 rounded-2xl text-left">
+              {selectedMoviePopup.desc}
+            </p>
+
+            <button
+              onClick={() => setSelectedMoviePopup(null)}
+              className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 rounded-full transition-all shadow-lg shadow-red-600/30 cursor-pointer"
+            >
+              Хаах (Буцах)
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* VIP PROFILE MODAL */}
       {isProfileOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-fade-in">
@@ -2246,62 +2964,133 @@ export default function App() {
                 <div className="absolute inset-0 rounded-full bg-amber-500 blur-xl opacity-30 animate-pulse" />
                 <Trophy size={32} className="animate-bounce" />
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Аниме Отакуудын Жагсаалт</h2>
-              <p className="text-gray-400 text-sm mt-1">Хамгийн өндөр оноотой шилдэг тоглогчид</p>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Шилдэг Тоглогчдын Жагсаалт</h2>
+              <p className="text-gray-400 text-sm mt-1">Отаку болон Хөлбөмбөгийн топ 10 жагсаалт</p>
             </div>
 
-            {/* Category Filter Tabs */}
-            <div className="flex bg-white/5 p-1 rounded-2xl mb-4 border border-white/5">
+            {/* Main Leaderboard Tab (Anime vs Football) */}
+            <div className="flex bg-white/5 p-1 rounded-2xl mb-4 border border-white/10">
               <button
-                onClick={() => setLeaderboardCategoryFilter('all')}
+                onClick={() => setActiveLeaderboardTab('anime')}
                 className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
-                  leaderboardCategoryFilter === 'all'
+                  activeLeaderboardTab === 'anime'
                     ? 'bg-red-600 text-white shadow-md'
                     : 'text-gray-400 hover:text-white hover:bg-white/5'
                 }`}
               >
-                Бүгд (All)
+                🎌 Аниме Таавар
               </button>
               <button
-                onClick={() => setLeaderboardCategoryFilter('emoji')}
+                onClick={() => setActiveLeaderboardTab('football')}
                 className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
-                  leaderboardCategoryFilter === 'emoji'
-                    ? 'bg-red-600 text-white shadow-md'
+                  activeLeaderboardTab === 'football'
+                    ? 'bg-green-600 text-white shadow-md'
                     : 'text-gray-400 hover:text-white hover:bg-white/5'
                 }`}
               >
-                Эможи (Emoji)
-              </button>
-              <button
-                onClick={() => setLeaderboardCategoryFilter('character')}
-                className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
-                  leaderboardCategoryFilter === 'character'
-                    ? 'bg-red-600 text-white shadow-md'
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                Дүр (Chapter)
+                ⚽ Хөлбөмбөг (Top 10)
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto pr-1 space-y-2 mb-6">
-              {leaderboard.filter(entry => leaderboardCategoryFilter === 'all' || entry.category === leaderboardCategoryFilter).length === 0 ? (
-                <div className="text-center py-8 text-gray-500 text-sm">Одоогоор энэ ангилалд оноо байхгүй байна. 🚀</div>
-              ) : (
-                leaderboard
-                  .filter(entry => leaderboardCategoryFilter === 'all' || entry.category === leaderboardCategoryFilter)
-                  .slice(0, 10)
-                  .map((entry, idx) => {
+            {activeLeaderboardTab === 'anime' ? (
+              <>
+                {/* Category Filter Tabs */}
+                <div className="flex bg-white/5 p-1 rounded-2xl mb-4 border border-white/5">
+                  <button
+                    onClick={() => setLeaderboardCategoryFilter('all')}
+                    className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+                      leaderboardCategoryFilter === 'all'
+                        ? 'bg-red-600 text-white shadow-md'
+                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    Бүгд (All)
+                  </button>
+                  <button
+                    onClick={() => setLeaderboardCategoryFilter('emoji')}
+                    className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+                      leaderboardCategoryFilter === 'emoji'
+                        ? 'bg-red-600 text-white shadow-md'
+                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    Эможи (Emoji)
+                  </button>
+                  <button
+                    onClick={() => setLeaderboardCategoryFilter('character')}
+                    className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+                      leaderboardCategoryFilter === 'character'
+                        ? 'bg-red-600 text-white shadow-md'
+                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    Дүр (Character)
+                  </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto pr-1 space-y-2 mb-6">
+                  {leaderboard.filter(entry => leaderboardCategoryFilter === 'all' || entry.category === leaderboardCategoryFilter).length === 0 ? (
+                    <div className="text-center py-8 text-gray-500 text-sm">Одоогоор энэ ангилалд оноо байхгүй байна. 🚀</div>
+                  ) : (
+                    leaderboard
+                      .filter(entry => leaderboardCategoryFilter === 'all' || entry.category === leaderboardCategoryFilter)
+                      .slice(0, 10)
+                      .map((entry, idx) => {
+                        const isTop3 = idx < 3;
+                        const medalColors = ['from-yellow-400 to-amber-500 text-black', 'from-slate-300 to-slate-400 text-black', 'from-amber-600 to-amber-800 text-white'];
+                        return (
+                          <div
+                            key={entry.id}
+                            className={`flex items-center justify-between p-3.5 rounded-2xl border transition-all ${
+                              entry.name.includes("Наран Од")
+                                ? 'bg-red-600/10 border-red-500/30'
+                                : 'bg-white/5 border-white/5 hover:border-white/10'
+                            }`}
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              {isTop3 ? (
+                                <div className={`w-7 h-7 rounded-full bg-gradient-to-br ${medalColors[idx]} font-black text-xs flex items-center justify-center shrink-0`}>
+                                  {idx + 1}
+                                </div>
+                              ) : (
+                                <div className="w-7 h-7 font-bold text-xs text-gray-500 flex items-center justify-center shrink-0">
+                                  {idx + 1}
+                                </div>
+                              )}
+                              <span className="font-bold text-white truncate text-sm sm:text-base">
+                                {entry.name}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                              <span className="text-[10px] bg-red-500/10 border border-red-500/20 px-1.5 py-0.5 rounded-full text-red-400 font-medium scale-90 shrink-0">
+                                {entry.category === 'character' ? 'Дүр' : 'Эможи'}
+                              </span>
+                              <span className="text-[10px] sm:text-xs bg-white/5 border border-white/10 px-1.5 sm:px-2 py-0.5 rounded-full text-gray-400 font-mono">
+                                {entry.playMode === 'type' ? 'Бичих ✍️' : 'Сонгох 🎯'}
+                              </span>
+                              <span className="font-mono text-sm sm:text-base font-black text-amber-400 ml-1">
+                                {entry.score}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 overflow-y-auto pr-1 space-y-2 mb-6">
+                {footballLeaderboard.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500 text-sm">Хөлбөмбөгийн оноо одоогоор бүртгэгдээгүй байна. ⚽</div>
+                ) : (
+                  footballLeaderboard.slice(0, 10).map((entry, idx) => {
                     const isTop3 = idx < 3;
                     const medalColors = ['from-yellow-400 to-amber-500 text-black', 'from-slate-300 to-slate-400 text-black', 'from-amber-600 to-amber-800 text-white'];
                     return (
                       <div
                         key={entry.id}
-                        className={`flex items-center justify-between p-3.5 rounded-2xl border transition-all ${
-                          entry.name.includes("Наран Од")
-                            ? 'bg-red-600/10 border-red-500/30'
-                            : 'bg-white/5 border-white/5 hover:border-white/10'
-                        }`}
+                        className="flex items-center justify-between p-3.5 rounded-2xl border bg-white/5 border-white/5 hover:border-white/10 transition-all"
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           {isTop3 ? (
@@ -2318,22 +3107,20 @@ export default function App() {
                           </span>
                         </div>
 
-                        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                          <span className="text-[10px] bg-red-500/10 border border-red-500/20 px-1.5 py-0.5 rounded-full text-red-400 font-medium scale-90 shrink-0">
-                            {entry.category === 'character' ? 'Дүр' : 'Эможи'}
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className="text-[10px] bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-full text-green-400 font-medium">
+                            {entry.teamSize} vs {entry.teamSize}
                           </span>
-                          <span className="text-[10px] sm:text-xs bg-white/5 border border-white/10 px-1.5 sm:px-2 py-0.5 rounded-full text-gray-400 font-mono">
-                            {entry.playMode === 'type' ? 'Бичих ✍️' : 'Сонгох 🎯'}
-                          </span>
-                          <span className="font-mono text-sm sm:text-base font-black text-amber-400 ml-1">
-                            {entry.score}
+                          <span className="text-xs text-gray-400 font-mono">
+                            Гоол: <strong className="text-white">{entry.score}</strong> - {entry.aiScore}
                           </span>
                         </div>
                       </div>
                     );
                   })
-              )}
-            </div>
+                )}
+              </div>
+            )}
 
             <button
               onClick={() => setIsLeaderboardOpen(false)}

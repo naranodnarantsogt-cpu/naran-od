@@ -18,6 +18,15 @@ export interface ScoreEntry {
   createdAt: any;
 }
 
+export interface FootballScoreEntry {
+  id: string;
+  name: string;
+  score: number;
+  aiScore: number;
+  teamSize: number;
+  createdAt: any;
+}
+
 export enum OperationType {
   CREATE = 'create',
   UPDATE = 'update',
@@ -63,6 +72,7 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
 }
 
 const SCORES_COLLECTION = 'scores';
+const FOOTBALL_SCORES_COLLECTION = 'football_scores';
 
 /**
  * Saves a new score to the Firestore database
@@ -116,6 +126,62 @@ export async function getTopScoresFromFirestore(): Promise<ScoreEntry[]> {
     return results;
   } catch (error) {
     handleFirestoreError(error, OperationType.LIST, SCORES_COLLECTION);
+    return [];
+  }
+}
+
+/**
+ * Saves a football game score to Firestore
+ */
+export async function saveFootballScoreToFirestore(
+  name: string,
+  score: number,
+  aiScore: number,
+  teamSize: number
+): Promise<string | null> {
+  try {
+    const fbRef = collection(db, FOOTBALL_SCORES_COLLECTION);
+    const docRef = await addDoc(fbRef, {
+      name: name.trim() || 'Тоглогч',
+      score: score,
+      aiScore: aiScore,
+      teamSize: teamSize,
+      createdAt: serverTimestamp()
+    });
+    return docRef.id;
+  } catch (error) {
+    handleFirestoreError(error, OperationType.WRITE, FOOTBALL_SCORES_COLLECTION);
+    return null;
+  }
+}
+
+/**
+ * Retrieves the top 10 football scores from Firestore
+ */
+export async function getTopFootballScoresFromFirestore(): Promise<FootballScoreEntry[]> {
+  try {
+    const fbRef = collection(db, FOOTBALL_SCORES_COLLECTION);
+    const q = query(
+      fbRef,
+      orderBy('score', 'desc'),
+      limit(10)
+    );
+    const querySnapshot = await getDocs(q);
+    const results: FootballScoreEntry[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      results.push({
+        id: doc.id,
+        name: data.name || 'Тоглогч',
+        score: Number(data.score) || 0,
+        aiScore: Number(data.aiScore) || 0,
+        teamSize: Number(data.teamSize) || 1,
+        createdAt: data.createdAt
+      });
+    });
+    return results;
+  } catch (error) {
+    handleFirestoreError(error, OperationType.LIST, FOOTBALL_SCORES_COLLECTION);
     return [];
   }
 }

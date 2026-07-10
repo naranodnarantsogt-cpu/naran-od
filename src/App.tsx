@@ -36,7 +36,7 @@ const favoriteMovies = [
     title: "One Piece: Red", 
     rating: "9.5", 
     genre: "Аниме", 
-    image: "https://upload.wikimedia.org/wikipedia/en/thumb/4/44/One_Piece_Film_Red_Visual_Poster.jpg/250px-One_Piece_Film_Red_Visual_Poster.",
+    image: "https:https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXO4Mq-lKqnwo6X4CIR6pMqZBYcRBw1-EwgGFrtWEITg&s=10",
     desc: "Далайн дээрэмчдийн хаан болох хүсэлтэй Луффи болон Ута нарын гайхалтай дуу хөгжим, адал явдлаар дүүрэн аниме кино."
   },
   { 

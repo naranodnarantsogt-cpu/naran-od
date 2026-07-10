@@ -36,22 +36,22 @@ const favoriteMovies = [
     title: "One Piece: Red", 
     rating: "9.5", 
     genre: "Аниме", 
-    image: "https:https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXO4Mq-lKqnwo6X4CIR6pMqZBYcRBw1-EwgGFrtWEITg&s=10",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXO4Mq-lKqnwo6X4CIR6pMqZBYcRBw1-EwgGFrtWEITg&s=10",
     desc: "Далайн дээрэмчдийн хаан болох хүсэлтэй Луффи болон Ута нарын гайхалтай дуу хөгжим, адал явдлаар дүүрэн аниме кино."
   },
   { 
     title: "Demon Slayer Movie", 
     rating: "9.7", 
     genre: "Тулаант", 
-    image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=800&auto=format&fit=crop&q=80",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_EFHvFzN5TbUNghJL41fvEpSgjA09RnPnke7vPYg2zg&s=10",
     desc: "Танжиро болон Хашира нарын үлэмж хүчтэй харгис демончуудтай хийх ширүүн тулаан, гайхалтай дүрслэл бүхий кино."
   },
   { 
-    title: "Interstellar", 
-    rating: "9.6", 
+    title: "Stranger Things", 
+    rating: "9.9", 
     genre: "Sci-Fi", 
-    image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80",
-    desc: "Сансар огторгуй, хар нүх болон цаг хугацааны гайхамшгийг харуулсан Кристофер Ноланы шилдэг кино."
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1nSfSCBM-PqaZg0zZZRUHYshewy69EMFdWjJhmmeBJw&s",
+    desc: "Хокинс хотод өрнөх нууцлаг 80-аад оны шинжлэх ухааны уран зөгнөлт, аймшиг болон адал явдлаар дүүрэн гайхалтай цуврал кино."
   }
 ];
 
@@ -296,8 +296,12 @@ const shuffleArray = <T,>(array: T[]): T[] => {
   return arr;
 };
 
+
+
+
+
 // Football Game Component (vs AI)
-function FootballGame({ teamSize, onBack }: { teamSize: 1 | 2; onBack: () => void }) {
+function FootballGame({ teamSize, onBack }: { teamSize: 1 | 2 | 6; onBack: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [scoreUser, setScoreUser] = useState(0);
   const [scoreAi, setScoreAi] = useState(0);
@@ -323,8 +327,31 @@ function FootballGame({ teamSize, onBack }: { teamSize: 1 | 2; onBack: () => voi
     let timerInterval: any;
 
     const ball = { x: 300, y: 175, vx: 0, vy: 0, radius: 8 };
-    const userPlayers = teamSize === 1 ? [{ x: 150, y: 175 }] : [{ x: 150, y: 120 }, { x: 150, y: 230 }];
-    const aiPlayers = teamSize === 1 ? [{ x: 450, y: 175 }] : [{ x: 450, y: 120 }, { x: 450, y: 230 }];
+    const userPlayers = teamSize === 1 
+      ? [{ x: 150, y: 175 }] 
+      : teamSize === 2 
+      ? [{ x: 150, y: 120 }, { x: 150, y: 230 }]
+      : [
+          { x: 80, y: 175 },
+          { x: 120, y: 110 },
+          { x: 120, y: 240 },
+          { x: 160, y: 70 },
+          { x: 160, y: 280 },
+          { x: 200, y: 175 },
+        ];
+
+    const aiPlayers = teamSize === 1 
+      ? [{ x: 450, y: 175, vx: (Math.random() - 0.5) * 3.8, vy: (Math.random() - 0.5) * 3.8 }] 
+      : teamSize === 2 
+      ? [{ x: 450, y: 120, vx: (Math.random() - 0.5) * 3.8, vy: (Math.random() - 0.5) * 3.8 }, { x: 450, y: 230, vx: (Math.random() - 0.5) * 3.8, vy: (Math.random() - 0.5) * 3.8 }]
+      : [
+          { x: 520, y: 175, vx: (Math.random() - 0.5) * 3.8, vy: (Math.random() - 0.5) * 3.8 },
+          { x: 480, y: 110, vx: (Math.random() - 0.5) * 3.8, vy: (Math.random() - 0.5) * 3.8 },
+          { x: 480, y: 240, vx: (Math.random() - 0.5) * 3.8, vy: (Math.random() - 0.5) * 3.8 },
+          { x: 440, y: 70, vx: (Math.random() - 0.5) * 3.8, vy: (Math.random() - 0.5) * 3.8 },
+          { x: 440, y: 280, vx: (Math.random() - 0.5) * 3.8, vy: (Math.random() - 0.5) * 3.8 },
+          { x: 400, y: 175, vx: (Math.random() - 0.5) * 3.8, vy: (Math.random() - 0.5) * 3.8 },
+        ];
     const referee = { x: 300, y: 220, vx: 1.2, vy: 0.8 };
 
     const keys: { [key: string]: boolean } = {};
@@ -355,10 +382,20 @@ function FootballGame({ teamSize, onBack }: { teamSize: 1 | 2; onBack: () => voi
       ball.y = 175;
       ball.vx = 0;
       ball.vy = 0;
-      userPlayers[0].x = 150; userPlayers[0].y = 175;
-      if (userPlayers[1]) { userPlayers[1].x = 150; userPlayers[1].y = 120; }
-      aiPlayers[0].x = 450; aiPlayers[0].y = 175;
-      if (aiPlayers[1]) { aiPlayers[1].x = 450; aiPlayers[1].y = 230; }
+      if (teamSize === 1) {
+        userPlayers[0].x = 150; userPlayers[0].y = 175;
+        aiPlayers[0].x = 450; aiPlayers[0].y = 175;
+      } else if (teamSize === 2) {
+        userPlayers[0].x = 150; userPlayers[0].y = 120;
+        userPlayers[1].x = 150; userPlayers[1].y = 230;
+        aiPlayers[0].x = 450; aiPlayers[0].y = 120;
+        aiPlayers[1].x = 450; aiPlayers[1].y = 230;
+      } else {
+        const uPos = [{ x: 80, y: 175 }, { x: 120, y: 110 }, { x: 120, y: 240 }, { x: 160, y: 70 }, { x: 160, y: 280 }, { x: 200, y: 175 }];
+        uPos.forEach((p, i) => { if (userPlayers[i]) { userPlayers[i].x = p.x; userPlayers[i].y = p.y; } });
+        const aPos = [{ x: 520, y: 175 }, { x: 480, y: 110 }, { x: 480, y: 240 }, { x: 440, y: 70 }, { x: 440, y: 280 }, { x: 400, y: 175 }];
+        aPos.forEach((p, i) => { if (aiPlayers[i]) { aiPlayers[i].x = p.x; aiPlayers[i].y = p.y; aiPlayers[i].vx = (Math.random() - 0.5) * 3.8; aiPlayers[i].vy = (Math.random() - 0.5) * 3.8; } });
+      }
       referee.x = 300; referee.y = 220;
     };
 
@@ -366,34 +403,40 @@ function FootballGame({ teamSize, onBack }: { teamSize: 1 | 2; onBack: () => voi
     let localScoreAi = 0;
 
     const update = () => {
-      const p1 = userPlayers[0];
-      const speed = 3.8;
-      if (keys['ArrowUp'] || keys['w'] || keys['W']) p1.y -= speed;
-      if (keys['ArrowDown'] || keys['s'] || keys['S']) p1.y += speed;
-      if (keys['ArrowLeft'] || keys['a'] || keys['A']) p1.x -= speed;
-      if (keys['ArrowRight'] || keys['d'] || keys['D']) p1.x += speed;
+      const speed = 4.8;
+      
+      // All user players move freely with controls or smooth wandering across the pitch
+      userPlayers.forEach((p, idx) => {
+        if (idx === 0) {
+          if (keys['ArrowUp'] || keys['w'] || keys['W']) p.y -= speed;
+          if (keys['ArrowDown'] || keys['s'] || keys['S']) p.y += speed;
+          if (keys['ArrowLeft'] || keys['a'] || keys['A']) p.x -= speed;
+          if (keys['ArrowRight'] || keys['d'] || keys['D']) p.x += speed;
+        } else {
+          // Teammates move freely towards ball or roam around dynamically
+          const targetX = ball.x + (Math.random() - 0.5) * 50;
+          const targetY = ball.y + (Math.random() - 0.5) * 50;
+          if (p.x < targetX) p.x += 2.8;
+          if (p.x > targetX) p.x -= 2.8;
+          if (p.y < targetY) p.y += 2.8;
+          if (p.y > targetY) p.y -= 2.8;
+        }
+        p.x = Math.max(25, Math.min(575, p.x));
+        p.y = Math.max(30, Math.min(320, p.y));
+      });
 
-      p1.x = Math.max(25, Math.min(285, p1.x));
-      p1.y = Math.max(30, Math.min(320, p1.y));
-
-      if (userPlayers[1]) {
-        const p2 = userPlayers[1];
-        if (keys['ArrowUp'] || keys['w'] || keys['W']) p2.y -= speed;
-        if (keys['ArrowDown'] || keys['s'] || keys['S']) p2.y += speed;
-        if (keys['ArrowLeft'] || keys['a'] || keys['A']) p2.x -= speed;
-        if (keys['ArrowRight'] || keys['d'] || keys['D']) p2.x += speed;
-        p2.x = Math.max(25, Math.min(285, p2.x));
-        p2.y = Math.max(30, Math.min(320, p2.y));
-      }
-
-      // AI movement
-      aiPlayers.forEach((ai, idx) => {
-        const targetY = ball.y + (idx === 0 ? 0 : (idx === 1 ? -40 : 40));
-        const targetX = Math.max(315, Math.min(575, ball.x));
-        if (ai.x < targetX) ai.x += 2.5;
-        if (ai.x > targetX) ai.x -= 2.5;
-        if (ai.y < targetY) ai.y += 2.5;
-        if (ai.y > targetY) ai.y -= 2.5;
+      // AI players move freely across the pitch (not stuck)
+      aiPlayers.forEach((ai) => {
+        if (Math.random() < 0.08) {
+          ai.vx = (Math.random() - 0.5) * 3.5;
+          ai.vy = (Math.random() - 0.5) * 3.5;
+        }
+        ai.x += ai.vx;
+        ai.y += ai.vy;
+        if (ai.x < 25 || ai.x > 575) ai.vx *= -1;
+        if (ai.y < 30 || ai.y > 320) ai.vy *= -1;
+        ai.x = Math.max(25, Math.min(575, ai.x));
+        ai.y = Math.max(30, Math.min(320, ai.y));
       });
 
       // Referee patrolling movement
@@ -730,12 +773,21 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [selectedMoviePopup, setSelectedMoviePopup] = useState<any | null>(null);
+  const [isSonicPlaying, setIsSonicPlaying] = useState(true);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  const handleMouseMoveMain = (e: React.MouseEvent) => {
+    const { clientX, clientY } = e;
+    const x = (clientX / window.innerWidth - 0.5) * 35;
+    const y = (clientY / window.innerHeight - 0.5) * 35;
+    setMousePos({ x, y });
+  };
 
   // Game state
   const [isGameOpen, setIsGameOpen] = useState(false);
   const [questionsRaw, setQuestionsRaw] = useState<any[]>(fallbackQuestions);
   const [selectedCategory, setSelectedCategory] = useState<'emoji' | 'character' | 'football' | null>(null);
-  const [fbTeamSize, setFbTeamSize] = useState<1 | 2>(1);
+  const [fbTeamSize, setFbTeamSize] = useState<1 | 2 | 6>(1);
   const [questions, setQuestions] = useState<any[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -871,6 +923,94 @@ export default function App() {
     };
     fetchScores();
   }, []);
+
+  // Listen for 'M' or 'm' key to toggle Sonic theme song playback
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'm' || e.key === 'M') {
+        // Prevent default only if not typing in an input
+        if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) {
+          return;
+        }
+        setIsSonicPlaying(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Sonic Theme Song Player Effect using Web Audio API (16-bit Genesis Chiptune)
+  useEffect(() => {
+    if (!isSonicPlaying) return;
+
+    let audioCtx: AudioContext | null = null;
+    let timer: number | null = null;
+    let isCancelled = false;
+
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      audioCtx = new AudioCtx();
+
+      // Green Hill Zone Act 1 melody notes & timings
+      const tempo = 165;
+      const beatSec = 60 / tempo;
+      
+      const melody = [
+        { f: 369.99, d: 0.5 }, { f: 440.00, d: 0.5 }, { f: 493.88, d: 0.5 }, { f: 554.37, d: 0.5 },
+        { f: 587.33, d: 1.0 }, { f: 659.25, d: 0.5 }, { f: 587.33, d: 0.5 }, { f: 554.37, d: 1.0 },
+        { f: 493.88, d: 0.5 }, { f: 440.00, d: 0.5 }, { f: 369.99, d: 1.0 }, { f: 440.00, d: 1.0 },
+        { f: 493.88, d: 0.5 }, { f: 554.37, d: 0.5 }, { f: 659.25, d: 1.0 }, { f: 554.37, d: 1.0 },
+        { f: 493.88, d: 0.5 }, { f: 440.00, d: 0.5 }, { f: 369.99, d: 1.0 }, { f: 293.66, d: 1.0 },
+        { f: 369.99, d: 0.5 }, { f: 440.00, d: 0.5 }, { f: 493.88, d: 0.5 }, { f: 554.37, d: 0.5 },
+        { f: 740.00, d: 1.0 }, { f: 659.25, d: 1.0 }, { f: 587.33, d: 1.0 }, { f: 554.37, d: 1.0 },
+      ];
+
+      let noteIndex = 0;
+
+      const playNextNote = () => {
+        if (isCancelled || !audioCtx) return;
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+
+        const note = melody[noteIndex % melody.length];
+        noteIndex++;
+
+        try {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+
+          osc.type = 'square'; // Classic Sega Genesis FM/Chiptune square wave
+          osc.frequency.setValueAtTime(note.f, audioCtx.currentTime);
+
+          gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + note.d * beatSec * 0.85);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start();
+          osc.stop(audioCtx.currentTime + note.d * beatSec);
+        } catch (e) {
+          console.error("Audio note error:", e);
+        }
+
+        timer = window.setTimeout(playNextNote, note.d * beatSec * 1000);
+      };
+
+      playNextNote();
+    } catch (err) {
+      console.error("Sonic AudioContext error:", err);
+    }
+
+    return () => {
+      isCancelled = true;
+      if (timer) window.clearTimeout(timer);
+      if (audioCtx && audioCtx.state !== 'closed') {
+        audioCtx.close().catch(() => {});
+      }
+    };
+  }, [isSonicPlaying]);
 
   // Fetch scores when leaderboard is opened
   useEffect(() => {
@@ -1383,6 +1523,7 @@ export default function App() {
                             setCurrentQuestionIndex(0);
                             setSelectedCategory('emoji');
                             setTimeLeft(playMode === 'type' ? 20 : 15);
+                            setIsGameOpen(true);
                           }}
                           className="flex flex-col items-center justify-center p-4 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-red-500/50 hover:scale-[1.02] transition-all duration-300 group cursor-pointer"
                         >
@@ -1403,6 +1544,7 @@ export default function App() {
                             setCurrentQuestionIndex(0);
                             setSelectedCategory('character');
                             setTimeLeft(playMode === 'type' ? 20 : 15);
+                            setIsGameOpen(true);
                           }}
                           className="flex flex-col items-center justify-center p-4 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-red-500/50 hover:scale-[1.02] transition-all duration-300 group cursor-pointer"
                         >
@@ -1434,6 +1576,14 @@ export default function App() {
                           >
                             2 vs 2
                           </button>
+                          <button
+                            onClick={() => setFbTeamSize(6)}
+                            className={`px-3 py-1 rounded-xl font-bold text-[11px] transition-all cursor-pointer ${
+                              fbTeamSize === 6 ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                            }`}
+                          >
+                            6 vs 6
+                          </button>
                         </div>
                         <button
                           onClick={() => setSelectedCategory('football')}
@@ -1442,6 +1592,8 @@ export default function App() {
                           Хөлбөмбөг эхлүүлэх ⚽
                         </button>
                       </div>
+
+
                     </div>
 
                     {/* Right: Prominent Leaderboard */}
@@ -2028,32 +2180,7 @@ export default function App() {
 
           {/* Right Side - Navigation Arrows & Favorite Movies on Movies Tab */}
           <div className="flex flex-col items-end gap-3 md:w-auto self-end md:self-end">
-            {activeSlide === 0 && (
-              <div className="bg-black/60 border border-white/10 rounded-2xl p-3.5 backdrop-blur-xl w-64 sm:w-72 animate-blur-fade-up shadow-2xl mb-1">
-                <div className="flex items-center gap-1.5 text-amber-400 font-extrabold text-xs mb-2.5 pb-1.5 border-b border-white/10">
-                  <Film size={14} className="text-amber-400" />
-                  <span>Наран одын дуртай кинонууд 🍿</span>
-                </div>
-                <div className="space-y-1.5">
-                  {favoriteMovies.map((movie, idx) => (
-                    <div
-                      key={idx}
-                      onClick={() => setSelectedMoviePopup(movie)}
-                      className="flex items-center justify-between text-[11px] bg-white/5 hover:bg-white/15 p-2 rounded-xl transition-all border border-white/5 cursor-pointer group"
-                    >
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <span className="text-gray-500 font-bold">{idx + 1}.</span>
-                        <span className="font-bold text-white truncate max-w-[130px] group-hover:text-red-400 transition-colors">{movie.title}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <span className="text-[9px] text-gray-400 bg-white/10 px-1.5 py-0.5 rounded font-medium">{movie.genre}</span>
-                        <span className="text-amber-400 font-mono font-bold">★ {movie.rating}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+
 
             <div className="flex items-center gap-3">
               <button
@@ -3130,6 +3257,63 @@ export default function App() {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Persistent Floating Widgets (Hidden when playing games for clean fullscreen experience) */}
+      {!isGameOpen && selectedCategory === null && (
+        <>
+          <div className="fixed top-4 right-4 z-50 bg-gray-900/90 border border-blue-500/40 rounded-2xl p-2.5 shadow-2xl backdrop-blur-md flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-blue-600/30 flex items-center justify-center text-blue-400 relative shrink-0">
+              {isSonicPlaying && (
+                <div className="absolute inset-0 rounded-xl bg-blue-500 animate-ping opacity-25" />
+              )}
+              <span className="text-lg">🦔</span>
+            </div>
+            <div className="hidden sm:block text-left">
+              <div className="text-xs font-bold text-white flex items-center gap-1">
+                Sonic Green Hill <span className="text-[10px] text-blue-400 font-mono">([M])</span>
+              </div>
+              <div className="text-[10px] text-gray-400">
+                {isSonicPlaying ? '🎵 Тоглож байна...' : '⏸️ Зогссон'}
+              </div>
+            </div>
+            <button
+              onClick={() => setIsSonicPlaying(!isSonicPlaying)}
+              className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all shadow-md cursor-pointer ${
+                isSonicPlaying 
+                  ? 'bg-amber-500 hover:bg-amber-600 text-black shadow-amber-500/30' 
+                  : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/30'
+              }`}
+            >
+              {isSonicPlaying ? '⏸️ Зогсоох' : '▶️ Тоглуулах'}
+            </button>
+          </div>
+
+          <div className="fixed bottom-4 right-4 z-40 bg-black/80 border border-amber-500/30 rounded-2xl p-3.5 backdrop-blur-xl shadow-2xl w-64 sm:w-72">
+            <div className="flex items-center gap-1.5 text-amber-400 font-extrabold text-xs mb-2.5 pb-1.5 border-b border-white/10">
+              <Film size={14} className="text-amber-400" />
+              <span>Наран одын дуртай кинонууд 🍿</span>
+            </div>
+            <div className="space-y-1.5">
+              {favoriteMovies.map((movie, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => setSelectedMoviePopup(movie)}
+                  className="flex items-center justify-between text-[11px] bg-white/5 hover:bg-white/15 p-2 rounded-xl transition-all border border-white/5 cursor-pointer group"
+                >
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="text-gray-500 font-bold">{idx + 1}.</span>
+                    <span className="font-bold text-white truncate max-w-[130px] group-hover:text-red-400 transition-colors">{movie.title}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="text-[9px] text-gray-400 bg-white/10 px-1.5 py-0.5 rounded font-medium">{movie.genre}</span>
+                    <span className="text-amber-400 font-mono font-bold">★ {movie.rating}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
